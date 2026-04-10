@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Assistant Pro</title>
+<title>BOSS AI</title>
 
 <style>
   /* Base Styles */
@@ -25,9 +25,10 @@
     display: flex;
     flex-direction: column;
     border-right: 1px solid #4d4d4f;
+    position: relative;
   }
 
-  .sidebar h2 { font-size: 1.2rem; margin-bottom: 20px; color: #19c37d; }
+  .sidebar h2 { font-size: 1.5rem; margin-bottom: 20px; color: #19c37d; letter-spacing: 1px; }
 
   .btn-sidebar {
     background: transparent;
@@ -44,6 +45,16 @@
   .btn-sidebar:hover { background: #2a2b32; }
   .new-chat-btn { background: #3b82f6; border: none; }
   .new-chat-btn:hover { background: #2563eb; }
+
+  /* Developer Credit */
+  .footer {
+    margin-top: auto;
+    padding: 15px 0;
+    font-size: 0.85rem;
+    color: #9ea1a6;
+    border-top: 1px solid #4d4d4f;
+    text-align: center;
+  }
 
   /* Main Chat Area */
   .main { flex: 1; display: flex; flex-direction: column; position: relative; }
@@ -64,20 +75,11 @@
     border-radius: 15px;
     line-height: 1.5;
     word-wrap: break-word;
-    white-space: pre-wrap; /* Preserves line breaks from AI */
+    white-space: pre-wrap;
   }
 
-  .user { 
-    background: #2563eb; 
-    align-self: flex-end; 
-    border-bottom-right-radius: 2px;
-  }
-
-  .bot { 
-    background: #444654; 
-    align-self: flex-start; 
-    border-bottom-left-radius: 2px; 
-  }
+  .user { background: #2563eb; align-self: flex-end; border-bottom-right-radius: 2px; }
+  .bot { background: #444654; align-self: flex-start; border-bottom-left-radius: 2px; }
 
   /* Input Area */
   .input-area {
@@ -116,10 +118,9 @@
   }
 
   .send { background: #19c37d; color: white; }
-  .send:hover { background: #15a367; }
   .mic { background: #ef4444; margin-right: 5px; }
 
-  /* Modals (Login & Settings) */
+  /* Modals */
   .modal {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
@@ -147,6 +148,7 @@
     border: 1px solid #4d4d4f;
     padding: 10px;
     border-radius: 5px;
+    color: white;
   }
 
   .hidden { display: none !important; }
@@ -157,29 +159,33 @@
 
 <div class="modal" id="loginPage">
   <div class="modal-content">
-    <h2>Welcome Back</h2>
+    <h2>BOSS AI Login</h2>
     <input id="username" placeholder="Username">
     <input id="password" type="password" placeholder="Password">
-    <button class="send" style="width:100%" onclick="login()">Login</button>
-    <p id="error" style="color:#ff4a4a; margin-top:10px; display:none;">Invalid credentials</p>
+    <button class="send" style="width:100%" onclick="login()">Enter System</button>
+    <p id="error" style="color:#ff4a4a; margin-top:10px; display:none;">Access Denied</p>
   </div>
 </div>
 
 <div class="sidebar">
-  <h2>AI Pro v2026</h2>
+  <h2>BOSS AI</h2>
   <button class="btn-sidebar new-chat-btn" onclick="newChat()">+ New Chat</button>
   <button class="btn-sidebar" onclick="toggleSettings(true)">⚙️ Settings</button>
   <div id="history"></div>
+  
+  <div class="footer">
+    Developed with ❤️ by <br><strong>Bhupendra Saini</strong>
+  </div>
 </div>
 
 <div class="main">
   <div class="chat-box" id="chatBox">
-    <div class="message bot">Hello! How can I help you today?</div>
+    <div class="message bot">BOSS AI is active. How can I assist you, Bhupendra?</div>
   </div>
 
   <div class="input-area">
     <div class="input-container">
-      <input id="userInput" placeholder="Ask me anything..." onkeypress="handleKey(event)">
+      <input id="userInput" placeholder="Send a message..." onkeypress="handleKey(event)">
       <button class="mic" onclick="startListening()">🎤</button>
       <button class="send" onclick="sendMessage()">Send</button>
     </div>
@@ -189,10 +195,9 @@
 <div id="settingsPanel" class="modal hidden">
   <div class="modal-content">
     <h2>API Settings</h2>
-    <p style="font-size: 0.8rem; color: #aaa;">Enter your OpenRouter API Key</p>
-    <input id="apiInput" type="password" placeholder="sk-or-...">
-    <button class="send" onclick="saveAPI()">Save Key</button>
-    <button style="background:#444654; color:white;" onclick="toggleSettings(false)">Cancel</button>
+    <input id="apiInput" type="password" placeholder="OpenRouter API Key">
+    <button class="send" onclick="saveAPI()">Save</button>
+    <button style="background:#444654; color:white;" onclick="toggleSettings(false)">Close</button>
   </div>
 </div>
 
@@ -201,23 +206,17 @@ let API_KEY = localStorage.getItem("api_key") || "";
 let currentUser = localStorage.getItem("user") || null;
 let currentChat = [];
 
-// --- INITIALIZATION ---
 window.onload = () => {
   if (currentUser) {
     document.getElementById('loginPage').classList.add('hidden');
   }
 };
 
-function handleKey(e) {
-  if (e.key === 'Enter') sendMessage();
-}
+function handleKey(e) { if (e.key === 'Enter') sendMessage(); }
 
-// --- LOGIN LOGIC ---
 function login() {
   const user = document.getElementById('username').value;
   const pass = document.getElementById('password').value;
-
-  // Simple local check - In a real app, this should be server-side
   if (pass === "bhupi2026") {
     currentUser = user;
     localStorage.setItem("user", user);
@@ -227,10 +226,9 @@ function login() {
   }
 }
 
-// --- CHAT LOGIC ---
 function newChat() {
   currentChat = [];
-  document.getElementById('chatBox').innerHTML = '<div class="message bot">Started a new conversation.</div>';
+  document.getElementById('chatBox').innerHTML = '<div class="message bot">New session started.</div>';
 }
 
 function addMessage(text, sender) {
@@ -246,20 +244,15 @@ function addMessage(text, sender) {
 async function sendMessage() {
   const inputEl = document.getElementById('userInput');
   const message = inputEl.value.trim();
-
-  if (!API_KEY) {
-    alert("Please set your API key in Settings first.");
-    return toggleSettings(true);
-  }
+  if (!API_KEY) return toggleSettings(true);
   if (!message) return;
 
   addMessage(message, "user");
   inputEl.value = "";
 
-  // Create bot bubble with loading state
   const botMsg = document.createElement("div");
   botMsg.className = "message bot";
-  botMsg.innerText = "Typing...";
+  botMsg.innerText = "Processing...";
   document.getElementById('chatBox').appendChild(botMsg);
 
   try {
@@ -279,20 +272,17 @@ async function sendMessage() {
     });
 
     const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content || "Sorry, I encountered an error.";
+    const reply = data.choices?.[0]?.message?.content || "Connection error.";
 
     botMsg.innerText = "";
     typeText(botMsg, reply);
     speak(reply);
     currentChat.push({ text: reply, sender: "bot" });
-
   } catch (error) {
-    botMsg.innerText = "Error: Could not connect to API.";
-    console.error(error);
+    botMsg.innerText = "System Error.";
   }
 }
 
-// --- EFFECTS & VOICE ---
 function typeText(element, text) {
   let i = 0;
   const interval = setInterval(() => {
@@ -309,12 +299,10 @@ function speak(text) {
   if ('speechSynthesis' in window) {
     const speech = new SpeechSynthesisUtterance(text);
     speech.rate = 1.1;
-    speech.lang = "en-US";
     window.speechSynthesis.speak(speech);
   }
 }
 
-// Voice Recognition
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 if (SpeechRecognition) {
   const recognition = new SpeechRecognition();
@@ -327,7 +315,6 @@ if (SpeechRecognition) {
   document.querySelector('.mic').style.display = "none";
 }
 
-// --- SETTINGS ---
 function toggleSettings(show) {
   const panel = document.getElementById('settingsPanel');
   if (show) {
@@ -339,9 +326,8 @@ function toggleSettings(show) {
 }
 
 function saveAPI() {
-  const val = document.getElementById('apiInput').value;
-  API_KEY = val;
-  localStorage.setItem("api_key", val);
+  API_KEY = document.getElementById('apiInput').value;
+  localStorage.setItem("api_key", API_KEY);
   toggleSettings(false);
 }
 </script>
