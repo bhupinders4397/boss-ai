@@ -1,135 +1,284 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>AI Assistant</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
+<meta charset="UTF-8">
+<title>AI Assistant Pro</title>
 
-    .chat-container {
-      width: 400px;
-      height: 600px;
-      background: #1e293b;
-      border-radius: 15px;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
-    }
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial;
+}
 
-    .header {
-      background: #3b82f6;
-      padding: 15px;
-      text-align: center;
-      font-weight: bold;
-    }
+body {
+  display: flex;
+  height: 100vh;
+  background: #343541;
+  color: white;
+}
 
-    .chat-box {
-      flex: 1;
-      padding: 10px;
-      overflow-y: auto;
-    }
+/* Sidebar */
+.sidebar {
+  width: 250px;
+  background: #202123;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+}
 
-    .message {
-      margin: 8px 0;
-      padding: 10px;
-      border-radius: 10px;
-      max-width: 75%;
-    }
+.sidebar h2 {
+  margin-bottom: 10px;
+}
 
-    .user {
-      background: #22c55e;
-      align-self: flex-end;
-    }
+.new-chat {
+  background: #3b82f6;
+  padding: 10px;
+  border: none;
+  color: white;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
 
-    .bot {
-      background: #334155;
-      align-self: flex-start;
-    }
+.history {
+  flex: 1;
+  overflow-y: auto;
+}
 
-    .input-area {
-      display: flex;
-      border-top: 1px solid #475569;
-    }
+.history div {
+  padding: 8px;
+  background: #2a2b32;
+  margin-bottom: 5px;
+  cursor: pointer;
+}
 
-    input {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      outline: none;
-      background: #0f172a;
-      color: white;
-    }
+/* Chat area */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
 
-    button {
-      padding: 10px;
-      border: none;
-      background: #3b82f6;
-      color: white;
-      cursor: pointer;
-    }
+.chat-box {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
 
-    button:hover {
-      background: #2563eb;
-    }
-  </style>
+.message {
+  margin: 10px 0;
+  max-width: 70%;
+  padding: 12px;
+  border-radius: 10px;
+}
+
+.user {
+  background: #2563eb;
+  align-self: flex-end;
+}
+
+.bot {
+  background: #444654;
+}
+
+/* Input */
+.input-area {
+  display: flex;
+  padding: 10px;
+  background: #40414f;
+}
+
+input {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  outline: none;
+  background: #343541;
+  color: white;
+}
+
+button {
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+  background: #19c37d;
+  color: white;
+}
+
+/* Login */
+.login {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #111;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-box {
+  background: #202123;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.login input {
+  display: block;
+  margin: 10px 0;
+  width: 200px;
+}
+</style>
 </head>
+
 <body>
 
-<div class="chat-container">
-  <div class="header">AI Assistant</div>
-  
+<!-- LOGIN -->
+<div class="login" id="loginPage">
+  <div class="login-box">
+    <h2>Login</h2>
+    <input id="username" placeholder="Username">
+    <button onclick="login()">Enter</button>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <h2>AI Chat</h2>
+  <button class="new-chat" onclick="newChat()">+ New Chat</button>
+  <div class="history" id="history"></div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
   <div class="chat-box" id="chatBox"></div>
-  
+
   <div class="input-area">
-    <input type="text" id="userInput" placeholder="Type a message..." />
+    <input id="userInput" placeholder="Send a message...">
     <button onclick="sendMessage()">Send</button>
   </div>
 </div>
 
 <script>
-  function sendMessage() {
-    const input = document.getElementById("userInput");
-    const message = input.value.trim();
-    if (message === "") return;
+const API_KEY = "YOUR_OPENROUTER_API_KEY";
 
-    addMessage(message, "user");
-    input.value = "";
+let currentUser = null;
+let chats = [];
+let currentChat = [];
 
-    // Fake AI response
-    setTimeout(() => {
-      const response = getAIResponse(message);
-      addMessage(response, "bot");
-    }, 500);
+// 🔐 LOGIN
+function login() {
+  const user = document.getElementById("username").value;
+  if (!user) return;
+
+  currentUser = user;
+  localStorage.setItem("user", user);
+
+  loadChats();
+  document.getElementById("loginPage").style.display = "none";
+}
+
+// 🔄 LOAD CHATS
+function loadChats() {
+  chats = JSON.parse(localStorage.getItem(currentUser)) || [];
+  renderHistory();
+}
+
+// 🆕 NEW CHAT
+function newChat() {
+  currentChat = [];
+  document.getElementById("chatBox").innerHTML = "";
+}
+
+// 💾 SAVE CHAT
+function saveChat() {
+  chats.push(currentChat);
+  localStorage.setItem(currentUser, JSON.stringify(chats));
+  renderHistory();
+}
+
+// 📜 HISTORY
+function renderHistory() {
+  const historyDiv = document.getElementById("history");
+  historyDiv.innerHTML = "";
+
+  chats.forEach((chat, index) => {
+    const item = document.createElement("div");
+    item.innerText = chat[0]?.text || "Chat " + (index+1);
+    item.onclick = () => loadChat(index);
+    historyDiv.appendChild(item);
+  });
+}
+
+// 📂 LOAD CHAT
+function loadChat(index) {
+  currentChat = chats[index];
+  const chatBox = document.getElementById("chatBox");
+  chatBox.innerHTML = "";
+
+  currentChat.forEach(msg => {
+    addMessage(msg.text, msg.sender);
+  });
+}
+
+// 💬 ADD MESSAGE
+function addMessage(text, sender) {
+  const chatBox = document.getElementById("chatBox");
+  const msg = document.createElement("div");
+
+  msg.classList.add("message", sender);
+  msg.innerText = text;
+
+  chatBox.appendChild(msg);
+  chatBox.scrollTop = chatBox.scrollHeight;
+
+  currentChat.push({ text, sender });
+}
+
+// 🤖 SEND MESSAGE
+async function sendMessage() {
+  const input = document.getElementById("userInput");
+  const message = input.value.trim();
+  if (!message) return;
+
+  addMessage(message, "user");
+  input.value = "";
+
+  try {
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + API_KEY,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "openai/gpt-3.5-turbo",
+        messages: currentChat.map(m => ({
+          role: m.sender === "user" ? "user" : "assistant",
+          content: m.text
+        }))
+      })
+    });
+
+    const data = await response.json();
+    const reply = data.choices?.[0]?.message?.content;
+
+    addMessage(reply, "bot");
+
+  } catch (e) {
+    addMessage("Error", "bot");
   }
+}
 
-  function addMessage(text, sender) {
-    const chatBox = document.getElementById("chatBox");
-    const msg = document.createElement("div");
-    msg.classList.add("message", sender);
-    msg.innerText = text;
-    chatBox.appendChild(msg);
-    chatBox.scrollTop = chatBox.scrollHeight;
+// AUTO LOGIN
+window.onload = () => {
+  const savedUser = localStorage.getItem("user");
+  if (savedUser) {
+    currentUser = savedUser;
+    loadChats();
+    document.getElementById("loginPage").style.display = "none";
   }
-
-  function getAIResponse(input) {
-    input = input.toLowerCase();
-
-    if (input.includes("hello")) return "Hello! How can I help you?";
-    if (input.includes("how are you")) return "I'm just code, but I'm doing great!";
-    if (input.includes("bye")) return "Goodbye! Have a nice day!";
-    
-    return "I'm a simple AI demo. You said: " + input;
-  }
+};
 </script>
 
 </body>
