@@ -121,6 +121,7 @@ button {
   background: #202123;
   padding: 20px;
   border-radius: 10px;
+  text-align: center;
 }
 
 .login input {
@@ -138,7 +139,9 @@ button {
   <div class="login-box">
     <h2>Login</h2>
     <input id="username" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
     <button onclick="login()">Enter</button>
+    <p id="error" style="color:red; display:none;">Wrong password!</p>
   </div>
 </div>
 
@@ -166,10 +169,20 @@ let currentUser = null;
 let chats = [];
 let currentChat = [];
 
-// 🔐 LOGIN
+// 🔐 LOGIN WITH PASSWORD
 function login() {
   const user = document.getElementById("username").value;
+  const pass = document.getElementById("password").value;
+  const error = document.getElementById("error");
+
   if (!user) return;
+
+  if (pass !== "bhupi2026") {
+    error.style.display = "block";
+    return;
+  }
+
+  error.style.display = "none";
 
   currentUser = user;
   localStorage.setItem("user", user);
@@ -178,26 +191,26 @@ function login() {
   document.getElementById("loginPage").style.display = "none";
 }
 
-// 🔄 LOAD CHATS
+// LOAD CHATS
 function loadChats() {
   chats = JSON.parse(localStorage.getItem(currentUser)) || [];
   renderHistory();
 }
 
-// 🆕 NEW CHAT
+// NEW CHAT
 function newChat() {
   currentChat = [];
   document.getElementById("chatBox").innerHTML = "";
 }
 
-// 💾 SAVE CHAT
+// SAVE CHAT
 function saveChat() {
   chats.push(currentChat);
   localStorage.setItem(currentUser, JSON.stringify(chats));
   renderHistory();
 }
 
-// 📜 HISTORY
+// HISTORY
 function renderHistory() {
   const historyDiv = document.getElementById("history");
   historyDiv.innerHTML = "";
@@ -210,19 +223,19 @@ function renderHistory() {
   });
 }
 
-// 📂 LOAD CHAT
+// LOAD CHAT
 function loadChat(index) {
   currentChat = chats[index];
   const chatBox = document.getElementById("chatBox");
   chatBox.innerHTML = "";
 
   currentChat.forEach(msg => {
-    addMessage(msg.text, msg.sender);
+    addMessage(msg.text, msg.sender, false);
   });
 }
 
-// 💬 ADD MESSAGE
-function addMessage(text, sender) {
+// ADD MESSAGE
+function addMessage(text, sender, save = true) {
   const chatBox = document.getElementById("chatBox");
   const msg = document.createElement("div");
 
@@ -232,10 +245,12 @@ function addMessage(text, sender) {
   chatBox.appendChild(msg);
   chatBox.scrollTop = chatBox.scrollHeight;
 
-  currentChat.push({ text, sender });
+  if (save) {
+    currentChat.push({ text, sender });
+  }
 }
 
-// 🤖 SEND MESSAGE
+// SEND MESSAGE
 async function sendMessage() {
   const input = document.getElementById("userInput");
   const message = input.value.trim();
@@ -261,12 +276,15 @@ async function sendMessage() {
     });
 
     const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content;
+    const reply = data.choices?.[0]?.message?.content || "Error";
 
     addMessage(reply, "bot");
 
+    // Save chat after response
+    saveChat();
+
   } catch (e) {
-    addMessage("Error", "bot");
+    addMessage("Error connecting to AI", "bot");
   }
 }
 
