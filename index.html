@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Assistant</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .chat-container {
+      width: 400px;
+      height: 600px;
+      background: #1e293b;
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+
+    .header {
+      background: #3b82f6;
+      padding: 15px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .chat-box {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+    }
+
+    .message {
+      margin: 8px 0;
+      padding: 10px;
+      border-radius: 10px;
+      max-width: 75%;
+    }
+
+    .user {
+      background: #22c55e;
+      align-self: flex-end;
+    }
+
+    .bot {
+      background: #334155;
+      align-self: flex-start;
+    }
+
+    .input-area {
+      display: flex;
+      border-top: 1px solid #475569;
+    }
+
+    input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      outline: none;
+      background: #0f172a;
+      color: white;
+    }
+
+    button {
+      padding: 10px;
+      border: none;
+      background: #3b82f6;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #2563eb;
+    }
+  </style>
+</head>
+<body>
+
+<div class="chat-container">
+  <div class="header">AI Assistant</div>
+  
+  <div class="chat-box" id="chatBox"></div>
+  
+  <div class="input-area">
+    <input type="text" id="userInput" placeholder="Type a message..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
+
+<script>
+  function sendMessage() {
+    const input = document.getElementById("userInput");
+    const message = input.value.trim();
+    if (message === "") return;
+
+    addMessage(message, "user");
+    input.value = "";
+
+    // Fake AI response
+    setTimeout(() => {
+      const response = getAIResponse(message);
+      addMessage(response, "bot");
+    }, 500);
+  }
+
+  function addMessage(text, sender) {
+    const chatBox = document.getElementById("chatBox");
+    const msg = document.createElement("div");
+    msg.classList.add("message", sender);
+    msg.innerText = text;
+    chatBox.appendChild(msg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  function getAIResponse(input) {
+    input = input.toLowerCase();
+
+    if (input.includes("hello")) return "Hello! How can I help you?";
+    if (input.includes("how are you")) return "I'm just code, but I'm doing great!";
+    if (input.includes("bye")) return "Goodbye! Have a nice day!";
+    
+    return "I'm a simple AI demo. You said: " + input;
+  }
+</script>
+
+</body>
+</html>
