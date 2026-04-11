@@ -26,7 +26,7 @@
       background: radial-gradient(circle at top right, #1a1c2c, #0a0b10);
       color: #e2e8f0;
       overflow: hidden;
-      display: flex; /* Sidebar and Main side-by-side on desktop */
+      display: flex;
     }
 
     /* --- SIDEBAR --- */
@@ -43,13 +43,11 @@
       transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Desktop View Sidebar */
     @media (min-width: 1024px) {
       .sidebar { position: relative; transform: translateX(0) !important; }
       .menu-toggle { display: none !important; }
     }
 
-    /* Mobile View Sidebar */
     @media (max-width: 1023px) {
       .sidebar { position: fixed; left: 0; top: 0; transform: translateX(-100%); }
       .sidebar.active { transform: translateX(0); box-shadow: 20px 0 50px rgba(0,0,0,0.5); }
@@ -65,7 +63,6 @@
       border-radius: 12px;
       cursor: pointer;
       transition: 0.2s;
-      text-align: left;
     }
     .btn-sidebar:hover { background: rgba(255,255,255,0.1); border-color: var(--primary-glow); }
 
@@ -76,7 +73,7 @@
       flex-direction: column;
       position: relative;
       height: 100vh;
-      min-width: 0; /* Important: prevents content from pushing past screen width */
+      min-width: 0;
     }
 
     .menu-toggle {
@@ -92,26 +89,30 @@
     }
     .bar { width: 22px; height: 2px; background: var(--primary-glow); margin: 4px 0; border-radius: 2px; }
 
+    /* --- LOGO & WELCOME --- */
     #welcome-bg {
       position: absolute;
       top: 45%;
       left: 50%;
       transform: translate(-50%, -50%);
       text-align: center;
-      width: 90%;
+      width: 100%;
+      max-width: 500px;
       pointer-events: none;
       transition: opacity 0.5s;
       z-index: 1;
-    }
-    #welcome-bg h1 {
-      font-size: clamp(2.5rem, 8vw, 4.5rem);
-      font-weight: 800;
-      background: linear-gradient(to bottom, #fff, rgba(255,255,255,0.1));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-transform: uppercase;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
+    .logo-svg {
+      width: 100%;
+      height: auto;
+      filter: drop-shadow(0 0 15px rgba(0, 242, 254, 0.4));
+    }
+
+    /* --- CHAT AREA --- */
     .chat-box {
       flex: 1;
       overflow-y: auto;
@@ -178,7 +179,6 @@
       justify-content: center;
       transition: 0.3s;
     }
-    .send-btn:hover { transform: scale(1.05); }
 
     /* --- MODALS --- */
     .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
@@ -194,34 +194,59 @@
 
 <div class="menu-toggle" onclick="toggleSidebar()">
   <div class="bar"></div>
-  <div class="bar"></div>
+  <div class="bar :active"></div>
   <div class="bar"></div>
 </div>
 
 <div class="modal" id="loginPage">
   <div class="modal-content">
-    <h2 style="margin-bottom: 20px;">BOSS AI ACCESS</h2>
-    <input id="username" placeholder="Username" style="width: 100%; margin-bottom: 15px; background: #000; border: 1px solid var(--glass-border); padding: 14px; border-radius: 10px; color: white;">
+    <h2 style="margin-bottom: 20px; letter-spacing: 2px;">AUTHORIZATION</h2>
+    <input id="username" placeholder="User Identity" style="width: 100%; margin-bottom: 15px; background: #000; border: 1px solid var(--glass-border); padding: 14px; border-radius: 10px; color: white;">
     <input id="password" type="password" placeholder="Access Code" style="width: 100%; margin-bottom: 20px; background: #000; border: 1px solid var(--glass-border); padding: 14px; border-radius: 10px; color: white;">
-    <button class="btn-sidebar" style="background: var(--primary-glow); color: #000; font-weight: bold; text-align: center;" onclick="login()">INITIALIZE SYSTEM</button>
-    <p id="error" style="color:#f87171; margin-top:15px; display:none; font-size: 0.8rem;">ACCESS DENIED: INVALID CREDENTIALS</p>
+    <button class="btn-sidebar" style="background: var(--primary-glow); color: #000; font-weight: bold; text-align: center;" onclick="login()">BOOT SYSTEM</button>
+    <p id="error" style="color:#f87171; margin-top:15px; display:none; font-size: 0.8rem;">INVALID ACCESS CODE</p>
   </div>
 </div>
 
 <div class="sidebar" id="sidebar">
   <div style="margin-bottom: 40px;">
     <h2 style="color: var(--primary-glow); letter-spacing: 2px;">BOSS AI</h2>
-    <p style="font-size: 0.7rem; color: #64748b;">ELITE INTERFACE V2.0</p>
+    <p style="font-size: 0.7rem; color: #64748b;">QUANTUM INTERFACE V2.0</p>
   </div>
   <button class="btn-sidebar" onclick="newChat()">+ New Session</button>
   <button class="btn-sidebar" onclick="toggleSettings(true)">⚙️ API Configuration</button>
-  <div style="margin-top: auto; font-size: 0.7rem; color: #334155;">System: Online<br>Secure Protocol Active</div>
+  <div style="margin-top: auto; font-size: 0.7rem; color: #334155;">Neural Link: Active</div>
 </div>
 
 <div class="main">
   <div id="welcome-bg">
-    <p style="letter-spacing: 5px; color: var(--secondary-glow); font-size: 0.8rem;">CORE UNIT</p>
-    <h1>BOSS AI</h1>
+    <svg class="logo-svg" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="3.5" result="coloredBlur"/>
+          <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <linearGradient id="brainGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#00f2fe;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#4facfe;stop-opacity:1" />
+        </linearGradient>
+      </defs>
+      
+      <g filter="url(#glow)">
+        <path d="M180,80 c-40,0-70,30-70,70 c0,30,20,50,40,70 c10,10,30,10,30,0" fill="none" stroke="url(#brainGrad)" stroke-width="3">
+          <animate attributeName="stroke-dasharray" from="0,300" to="300,0" dur="4s" repeatCount="indefinite" />
+        </path>
+        <path d="M220,80 c40,0,70,30,70,70 c0,30-20,50-40,70 c-10,10-30,10-30,0" fill="none" stroke="url(#brainGrad)" stroke-width="3">
+          <animate attributeName="stroke-dasharray" from="300,0" to="0,300" dur="4s" repeatCount="indefinite" />
+        </path>
+        <rect x="185" y="135" width="30" height="30" rx="4" fill="#0a0b10" stroke="#fff" stroke-width="2">
+          <animate attributeName="stroke" values="#fff;#00f2fe;#fff" dur="2s" repeatCount="indefinite" />
+        </rect>
+        <path d="M190,145 h20 M190,150 h20 M190,155 h20" stroke="#00f2fe" stroke-width="1" />
+      </g>
+      
+      <text x="50%" y="260" text-anchor="middle" font-family="Inter" font-weight="800" font-size="48" fill="url(#brainGrad)" filter="url(#glow)" style="letter-spacing: 5px;">BOSS AI</text>
+    </svg>
   </div>
 
   <div class="chat-box" id="chatBox">
@@ -230,7 +255,7 @@
 
   <div class="input-area">
     <div class="input-container">
-      <input id="userInput" placeholder="Command system..." onkeypress="handleKey(event)">
+      <input id="userInput" placeholder="Initialize command..." onkeypress="handleKey(event)">
       <button class="send-btn" onclick="sendMessage()" id="sendBtn">
         <svg viewBox="0 0 24 24" style="width:18px; height:18px; fill:#000;"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
       </button>
@@ -238,17 +263,16 @@
   </div>
 
   <div class="footer-credit">
-    DEVELOPED BY <strong>BHUPENDRA SAINI</strong>
+    SYSTEM DESIGN BY <strong>BHUPENDRA SAINI</strong>
   </div>
 </div>
 
 <div id="settingsPanel" class="modal hidden">
   <div class="modal-content">
-    <h2 style="margin-bottom: 10px;">Settings</h2>
-    <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 20px;">Enter your OpenRouter API Key</p>
-    <input id="apiInput" type="password" placeholder="sk-or-v1-..." style="width: 100%; margin-bottom: 15px; background: #000; border: 1px solid var(--glass-border); padding: 14px; border-radius: 10px; color: white;">
-    <button class="btn-sidebar" style="background: var(--accent); color: #000; font-weight: bold; text-align: center;" onclick="saveAPI()">SAVE KEY</button>
-    <button class="btn-sidebar" style="text-align: center; border:none;" onclick="toggleSettings(false)">Cancel</button>
+    <h2 style="margin-bottom: 10px;">CONFIG</h2>
+    <input id="apiInput" type="password" placeholder="OpenRouter API Key" style="width: 100%; margin-bottom: 15px; background: #000; border: 1px solid var(--glass-border); padding: 14px; border-radius: 10px; color: white;">
+    <button class="btn-sidebar" style="background: var(--accent); color: #000; font-weight: bold;" onclick="saveAPI()">SAVE SETTINGS</button>
+    <button class="btn-sidebar" style="border:none;" onclick="toggleSettings(false)">Cancel</button>
   </div>
 </div>
 
@@ -295,7 +319,7 @@
 
     const botMsg = document.createElement("div");
     botMsg.className = "message bot";
-    botMsg.textContent = "Processing...";
+    botMsg.textContent = "Analyzing...";
     document.getElementById('messageContainer').appendChild(botMsg);
     
     const cb = document.getElementById('chatBox');
@@ -318,13 +342,13 @@
       });
       
       const data = await response.json();
-      const reply = data.choices?.[0]?.message?.content || "API Error: Ensure your key is valid.";
+      const reply = data.choices?.[0]?.message?.content || "ERROR: Link failure.";
       
       botMsg.textContent = ""; 
       typeText(botMsg, reply);
       currentChat.push({ text: reply, sender: "bot" });
     } catch (error) {
-      botMsg.textContent = "System Failure: Check Connection.";
+      botMsg.textContent = "CRITICAL ERROR: Connection terminated.";
     }
   }
 
