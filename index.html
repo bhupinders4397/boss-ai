@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BOSS AI | Elite Interface</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 
   <style>
     :root {
@@ -11,189 +12,190 @@
       --secondary-glow: #4facfe;
       --accent: #19c37d;
       --bg-dark: #0a0b10;
-      --panel-bg: rgba(23, 25, 35, 0.9);
+      --panel-bg: rgba(15, 17, 26, 0.95);
       --glass-border: rgba(255, 255, 255, 0.1);
+      --user-msg: #2563eb;
+      --bot-msg: rgba(255, 255, 255, 0.08);
     }
 
     * { margin:0; padding:0; box-sizing:border-box; font-family: 'Inter', sans-serif; }
 
     body {
-      display: flex;
       height: 100vh;
       background: radial-gradient(circle at top right, #1a1c2c, #0a0b10);
       color: #e2e8f0;
       overflow: hidden;
+      display: flex;
     }
 
-    /* Sidebar */
+    /* Sidebar - Improved for Desktop & Mobile */
     .sidebar {
       width: 280px;
       background: var(--panel-bg);
-      backdrop-filter: blur(20px);
+      backdrop-filter: blur(25px);
       padding: 25px;
       display: flex;
       flex-direction: column;
       border-right: 1px solid var(--glass-border);
-      z-index: 200;
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      position: absolute;
+      z-index: 1000;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: fixed;
       height: 100%;
       transform: translateX(-100%);
     }
 
+    @media (min-width: 1024px) {
+      .sidebar { position: relative; transform: translateX(0); }
+      .menu-toggle { display: none !important; }
+    }
+
     .sidebar.active { transform: translateX(0); }
 
-    .menu-toggle {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      z-index: 150;
-      cursor: pointer;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--glass-border);
-      padding: 10px;
-      border-radius: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
+    .sidebar h2 { font-weight: 800; letter-spacing: 1px; color: var(--primary-glow); }
 
-    .bar { width: 25px; height: 3px; background: var(--primary-glow); border-radius: 2px; }
-
-    #welcome-bg {
-      position: absolute;
-      top: 45%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-      pointer-events: none;
-      z-index: 1;
-      transition: opacity 0.5s;
-    }
-
-    #welcome-bg span {
-      font-size: 1.1rem;
-      text-transform: uppercase;
-      letter-spacing: 5px;
-      color: var(--secondary-glow);
-      display: block;
+    .btn-sidebar {
+      width: 100%;
+      padding: 12px;
       margin-bottom: 10px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--glass-border);
+      color: white;
+      border-radius: 10px;
+      cursor: pointer;
+      text-align: left;
+      transition: 0.2s;
     }
 
-    #welcome-bg h1 {
-      font-size: clamp(3rem, 10vw, 5rem);
-      font-weight: 900;
-      line-height: 0.9;
-      background: linear-gradient(to bottom, rgba(255,255,255,0.2), rgba(255,255,255,0.01));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-transform: uppercase;
+    .btn-sidebar:hover { background: rgba(255,255,255,0.1); border-color: var(--primary-glow); }
+
+    .menu-toggle {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      z-index: 500;
+      cursor: pointer;
+      background: rgba(10, 11, 16, 0.8);
+      border: 1px solid var(--glass-border);
+      padding: 12px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
     }
 
+    .bar { width: 20px; height: 2px; background: var(--primary-glow); border-radius: 2px; margin: 4px 0; }
+
+    /* Main Content Area */
     .main { 
       flex: 1; 
       display: flex; 
       flex-direction: column; 
       position: relative; 
-      width: 100%; 
       height: 100vh;
+      width: 100%;
+    }
+
+    #welcome-bg {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      width: 90%;
+      z-index: 1;
+      transition: opacity 0.5s, transform 0.5s;
+    }
+
+    #welcome-bg span { font-size: 0.9rem; letter-spacing: 6px; color: var(--secondary-glow); text-transform: uppercase; }
+    #welcome-bg h1 {
+      font-size: clamp(2.5rem, 8vw, 5rem);
+      font-weight: 800;
+      background: linear-gradient(to bottom, #fff 20%, rgba(255,255,255,0.1));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .chat-box {
       flex: 1;
-      padding: 80px 20px 20px 20px; 
       overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
+      padding: 80px 15px 120px 15px;
       z-index: 2;
-      /* Smooth scrolling */
       scroll-behavior: smooth;
     }
 
-    /* Fixed: Added padding to message container to avoid overlap with footer */
     .message-container {
-      max-width: 800px;
+      max-width: 900px;
       margin: 0 auto;
-      width: 100%;
       display: flex;
       flex-direction: column;
       gap: 20px;
-      padding-bottom: 40px; 
     }
 
     .message {
       max-width: 85%;
-      padding: 14px 18px;
-      border-radius: 18px;
-      line-height: 1.5;
-      animation: fadeIn 0.3s ease-out;
-      white-space: pre-wrap;
-      word-wrap: break-word;
+      padding: 14px 20px;
+      border-radius: 20px;
       font-size: 0.95rem;
+      line-height: 1.6;
+      animation: fadeIn 0.4s ease forwards;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
 
-    .user { background: #2563eb; align-self: flex-end; border-bottom-right-radius: 4px; }
-    .bot { background: rgba(255, 255, 255, 0.07); align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid var(--glass-border); }
+    .user { background: var(--user-msg); align-self: flex-end; border-bottom-right-radius: 4px; color: white; }
+    .bot { background: var(--bot-msg); align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid var(--glass-border); backdrop-filter: blur(5px); }
 
+    /* Floating Input Bar */
     .input-area { 
-      padding: 10px 20px 45px 20px; /* Increased bottom padding for the credit text */
-      z-index: 10; 
-      background: linear-gradient(transparent, #0a0b10 40%);
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      padding: 20px;
+      background: linear-gradient(transparent, var(--bg-dark) 70%);
+      z-index: 10;
     }
 
     .input-container {
-      max-width: 800px;
+      max-width: 850px;
       margin: 0 auto;
       display: flex;
       align-items: center;
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.07);
       border: 1px solid var(--glass-border);
-      border-radius: 28px;
-      padding: 6px 8px 6px 20px;
+      border-radius: 100px;
+      padding: 8px 10px 8px 25px;
       backdrop-filter: blur(20px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
 
-    input { flex: 1; padding: 10px 0; border: none; background: transparent; color: white; outline: none; }
+    input { flex: 1; padding: 10px 0; border: none; background: transparent; color: white; outline: none; font-size: 1rem; }
     
     .send-btn { 
       background: var(--primary-glow); 
-      color: #0f172a; 
+      color: #0a0b10; 
       border-radius: 50%; 
-      width: 40px; 
-      height: 40px; 
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: none; 
-      cursor: pointer; 
-      flex-shrink: 0;
+      width: 45px; height: 45px;
+      display: flex; align-items: center; justify-content: center;
+      border: none; cursor: pointer; transition: 0.3s;
+    }
+    .send-btn:hover { transform: scale(1.05); box-shadow: 0 0 15px var(--primary-glow); }
+
+    .footer-credit { 
+      position: absolute; bottom: 8px; width: 100%; text-align: center; font-size: 0.7rem; color: #4b5563; z-index: 11;
     }
 
-    /* Fixed Footer Positioning */
-    .footer-credit { 
-      position: absolute; 
-      bottom: 12px; 
-      left: 0;
-      right: 0;
-      text-align: center;
-      z-index: 5; 
-      pointer-events: none; 
+    /* Modals */
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(15px); display: flex; justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
+    .modal-content { 
+        background: #11121a; padding: 40px 30px; border-radius: 24px; width: 100%; max-width: 400px; 
+        border: 1px solid var(--glass-border); text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
     }
-    .credit-pill { 
-      display: inline-block;
-      background: rgba(0, 0, 0, 0.2); 
-      padding: 4px 15px; 
-      border-radius: 50px; 
-      font-size: 0.75rem; 
-      color: #64748b; 
-    }
-    
-    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-    .modal-content { background: #171923; padding: 30px; border-radius: 20px; width: 90%; max-width: 360px; border: 1px solid var(--glass-border); text-align: center; }
+
     .hidden { display: none !important; }
 
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
   </style>
 </head>
 <body>
@@ -206,26 +208,28 @@
 
 <div class="modal" id="loginPage">
   <div class="modal-content">
-    <h2 style="margin-bottom: 20px;">Access BOSS AI</h2>
-    <input id="username" placeholder="Username" style="display: block; width: 100%; margin-bottom: 15px; background: #0a0b10; border: 1px solid var(--glass-border); padding: 12px; border-radius: 8px; color: white;">
-    <input id="password" type="password" placeholder="Password" style="display: block; width: 100%; margin-bottom: 15px; background: #0a0b10; border: 1px solid var(--glass-border); padding: 12px; border-radius: 8px; color: white;">
-    <button class="send-btn" style="width:100%; border-radius: 8px; font-weight: bold;" onclick="login()">Initialize System</button>
-    <p id="error" style="color:#f87171; margin-top:15px; display:none; font-size: 0.9rem;">Identity Verification Failed</p>
+    <h1 style="font-size: 1.5rem; margin-bottom: 10px;">BOSS AI</h1>
+    <p style="color: #64748b; margin-bottom: 25px;">Enter credentials to initialize</p>
+    <input id="username" placeholder="Username" style="display: block; width: 100%; margin-bottom: 15px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 14px; border-radius: 12px; color: white;">
+    <input id="password" type="password" placeholder="Access Code" style="display: block; width: 100%; margin-bottom: 20px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 14px; border-radius: 12px; color: white;">
+    <button class="btn-sidebar" style="background: var(--primary-glow); color: black; font-weight: bold; text-align: center;" onclick="login()">AUTHORIZE</button>
+    <p id="error" style="color:#f87171; margin-top:15px; display:none; font-size: 0.85rem; font-weight: 600;">ACCESS DENIED: INVALID CODE</p>
   </div>
 </div>
 
 <div class="sidebar" id="sidebar">
-  <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-    <h2 style="font-size: 1.4rem;">BOSS AI</h2>
-    <button style="background:transparent; border:none; color:white; cursor:pointer; font-size:1.2rem;" onclick="toggleSidebar()">✕</button>
+  <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+    <h2>BOSS AI</h2>
+    <span style="font-size: 0.7rem; background: var(--accent); color: black; padding: 2px 8px; border-radius: 4px; font-weight: bold;">v2.0</span>
   </div>
-  <button class="btn-sidebar new-chat-btn" onclick="newChat()">+ New Session</button>
-  <button class="btn-sidebar" onclick="toggleSettings(true)">⚙️ Settings</button>
+  <button class="btn-sidebar" onclick="newChat()">+ New Session</button>
+  <button class="btn-sidebar" onclick="toggleSettings(true)">⚙️ API Settings</button>
+  <div style="margin-top: auto; font-size: 0.8rem; color: #4b5563;">Status: Secure Connection</div>
 </div>
 
 <div class="main">
   <div id="welcome-bg">
-    <span>Welcome to</span>
+    <span>Quantum Interface</span>
     <h1>BOSS AI</h1>
   </div>
 
@@ -235,26 +239,25 @@
 
   <div class="input-area">
     <div class="input-container">
-      <input id="userInput" placeholder="Send a message..." onkeypress="handleKey(event)">
+      <input id="userInput" placeholder="Ask anything..." onkeypress="handleKey(event)">
       <button class="send-btn" onclick="sendMessage()" id="sendBtn">
-        <svg viewBox="0 0 24 24" style="width:18px; height:18px; fill:currentColor;"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+        <svg viewBox="0 0 24 24" style="width:20px; height:20px; fill:currentColor;"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
       </button>
     </div>
   </div>
 
   <div class="footer-credit">
-    <div class="credit-pill">
-      Developed by <strong>Bhupendra Saini</strong>
-    </div>
+    Developed by <strong>Bhupendra Saini</strong> | © 2026
   </div>
 </div>
 
 <div id="settingsPanel" class="modal hidden">
   <div class="modal-content">
-    <h2 style="margin-bottom: 20px;">API Configuration</h2>
-    <input id="apiInput" type="password" placeholder="OpenRouter API Key" style="display: block; width: 100%; margin-bottom: 15px; background: #0a0b10; border: 1px solid var(--glass-border); padding: 12px; border-radius: 8px; color: white;">
-    <button class="send-btn" style="width:100%; border-radius: 8px; margin-bottom:10px; font-weight:bold;" onclick="saveAPI()">Save Key</button>
-    <button class="btn-sidebar" style="width:100%; text-align:center;" onclick="toggleSettings(false)">Close</button>
+    <h2 style="margin-bottom: 10px;">Configuration</h2>
+    <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 20px;">Provide OpenRouter API key to continue</p>
+    <input id="apiInput" type="password" placeholder="sk-or-v1-..." style="display: block; width: 100%; margin-bottom: 15px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 14px; border-radius: 12px; color: white;">
+    <button class="btn-sidebar" style="background: var(--accent); color: black; font-weight: bold; text-align: center;" onclick="saveAPI()">SAVE CONFIG</button>
+    <button class="btn-sidebar" style="text-align: center; margin-top: 10px;" onclick="toggleSettings(false)">CLOSE</button>
   </div>
 </div>
 
@@ -285,7 +288,8 @@
     currentChat = [];
     document.getElementById('messageContainer').innerHTML = '';
     document.getElementById('welcome-bg').style.opacity = '1';
-    toggleSidebar();
+    document.getElementById('welcome-bg').style.transform = 'translate(-50%, -50%) scale(1)';
+    if(window.innerWidth < 1024) toggleSidebar();
   }
 
   async function sendMessage() {
@@ -295,13 +299,14 @@
     if (!message) return;
 
     document.getElementById('welcome-bg').style.opacity = '0';
+    document.getElementById('welcome-bg').style.transform = 'translate(-50%, -60%) scale(0.9)';
 
     addMessage(message, "user");
     inputEl.value = "";
 
     const botMsg = document.createElement("div");
     botMsg.className = "message bot";
-    botMsg.textContent = "...";
+    botMsg.innerHTML = '<span class="typing-dots">Thinking...</span>';
     document.getElementById('messageContainer').appendChild(botMsg);
     
     const cb = document.getElementById('chatBox');
@@ -324,13 +329,13 @@
       });
       
       const data = await response.json();
-      const reply = data.choices?.[0]?.message?.content || "API Error.";
+      const reply = data.choices?.[0]?.message?.content || "Connection Error.";
       
       botMsg.textContent = ""; 
       typeText(botMsg, reply);
       currentChat.push({ text: reply, sender: "bot" });
     } catch (error) {
-      botMsg.textContent = "System Failure.";
+      botMsg.textContent = "Critical System Failure.";
     }
   }
 
@@ -356,22 +361,21 @@
         const cb = document.getElementById('chatBox');
         cb.scrollTop = cb.scrollHeight;
       }
-    }, 12);
+    }, 8);
   }
 
   function toggleSettings(show) {
     const panel = document.getElementById('settingsPanel');
     show ? panel.classList.remove('hidden') : panel.classList.add('hidden');
-    if(show) {
-        const side = document.getElementById('sidebar');
-        if(side.classList.contains('active')) side.classList.remove('active');
-    }
   }
 
   function saveAPI() {
-    API_KEY = document.getElementById('apiInput').value;
-    localStorage.setItem("api_key", API_KEY);
-    toggleSettings(false);
+    const val = document.getElementById('apiInput').value;
+    if(val) {
+        API_KEY = val;
+        localStorage.setItem("api_key", API_KEY);
+        toggleSettings(false);
+    }
   }
 
   window.onload = () => { 
