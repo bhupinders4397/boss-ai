@@ -1,353 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>BOSS AI | Elite Interface</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Sidebar</title>
 
-  <style>
-    :root {
-      --primary-glow: #00f2fe;
-      --secondary-glow: #4facfe;
-      --accent: #19c37d;
-      --bg-dark: #0a0b10;
-      --panel-bg: rgba(15, 17, 26, 0.98);
-      --glass-border: rgba(255, 255, 255, 0.1);
-      --user-msg: #2563eb;
-      --bot-msg: rgba(255, 255, 255, 0.08);
-    }
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    * { margin:0; padding:0; box-sizing:border-box; font-family: 'Inter', sans-serif; }
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f4f7f6;
+            color: #333;
+        }
 
-    body {
-      height: 100vh;
-      width: 100vw;
-      background: radial-gradient(circle at top right, #1a1c2c, #0a0b10);
-      color: #e2e8f0;
-      overflow: hidden;
-      display: flex;
-    }
+        /* Hamburger Button */
+        #menu-btn {
+            font-size: 24px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            padding: 12px 16px;
+            margin: 20px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
 
-    /* --- SIDEBAR --- */
-    .sidebar {
-      width: 300px;
-      height: 100vh;
-      background: var(--panel-bg);
-      backdrop-filter: blur(20px);
-      padding: 25px;
-      display: flex;
-      flex-direction: column;
-      border-right: 1px solid var(--glass-border);
-      z-index: 1000;
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+        #menu-btn:hover {
+            background: #f0f0f0;
+            transform: translateY(-1px);
+        }
 
-    .sidebar-top { flex: 1; overflow-y: auto; }
-    .sidebar-bottom { border-top: 1px solid var(--glass-border); padding-top: 15px; margin-top: 10px; }
+        /* Sidebar Container */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px; /* Hidden state */
+            width: 280px;
+            height: 100%;
+            background: #ffffff;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.1);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            padding: 20px;
+        }
 
-    @media (min-width: 1024px) {
-      .sidebar { position: relative; transform: translateX(0) !important; }
-      .menu-toggle { display: none !important; }
-    }
+        /* Toggle class for JS */
+        .sidebar.open {
+            transform: translateX(300px);
+        }
 
-    @media (max-width: 1023px) {
-      .sidebar { position: fixed; left: 0; top: 0; transform: translateX(-100%); }
-      .sidebar.active { transform: translateX(0); box-shadow: 20px 0 50px rgba(0,0,0,0.5); }
-    }
+        .close-btn {
+            display: block;
+            margin-left: auto;
+            font-size: 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #888;
+        }
 
-    .btn-sidebar {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 10px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--glass-border);
-      color: white;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: 0.2s;
-      text-align: left;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+        .sidebar ul {
+            list-style: none;
+            margin-top: 40px;
+        }
 
-    .btn-sidebar:hover { background: rgba(255,255,255,0.1); border-color: var(--primary-glow); }
+        .menu-item {
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            font-weight: 500;
+            padding: 15px;
+            cursor: pointer;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            transition: 0.3s;
+            color: #444;
+        }
 
-    /* --- MAIN LAYOUT --- */
-    .main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      position: relative;
-      overflow: hidden;
-    }
+        .menu-item:hover {
+            background: #f0f4ff;
+            color: #2563eb;
+        }
 
-    .chat-box {
-      flex: 1;
-      overflow-y: auto;
-      padding: 80px 15px 10px 15px;
-      display: flex;
-      flex-direction: column;
-      z-index: 2;
-      scroll-behavior: smooth;
-    }
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.3s ease;
+            z-index: 999;
+        }
 
-    .message-container {
-      max-width: 800px;
-      width: 100%;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      padding-bottom: 120px; 
-    }
-
-    .message {
-      max-width: 85%;
-      padding: 12px 16px;
-      border-radius: 15px;
-      font-size: 0.95rem;
-      line-height: 1.4;
-      animation: fadeIn 0.3s ease;
-    }
-    .user { background: var(--user-msg); align-self: flex-end; border-bottom-right-radius: 2px; }
-    .bot { background: var(--bot-msg); align-self: flex-start; border-bottom-left-radius: 2px; border: 1px solid var(--glass-border); }
-
-    /* --- FIXED INPUT SECTION --- */
-    .bottom-wrapper {
-      position: fixed;
-      bottom: 0;
-      right: 0;
-      width: 100%;
-      background: linear-gradient(transparent, var(--bg-dark) 40%);
-      padding: 20px 15px 10px 15px;
-      z-index: 10;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    
-    @media (min-width: 1024px) {
-      .bottom-wrapper { width: calc(100% - 300px); }
-    }
-
-    .input-container {
-      max-width: 800px;
-      width: 100%;
-      display: flex;
-      background: rgba(30, 32, 45, 0.95);
-      border: 1px solid var(--glass-border);
-      border-radius: 25px;
-      padding: 6px 6px 6px 18px; /* Restored original padding */
-      backdrop-filter: blur(15px);
-      margin-bottom: 8px;
-      align-items: center;
-    }
-
-    input { flex: 1; border: none; background: transparent; color: white; outline: none; font-size: 1rem; }
-    
-    /* Restored original Send Button style */
-    .send-btn {
-      background: var(--primary-glow);
-      border: none;
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* Minimalist styling for new icons */
-    .icon-btn-left {
-      cursor: pointer;
-      margin-right: 12px;
-      display: flex;
-      align-items: center;
-      color: #64748b;
-      transition: 0.2s;
-    }
-    .icon-btn-right {
-      cursor: pointer;
-      margin-right: 8px;
-      display: flex;
-      align-items: center;
-      color: #64748b;
-      transition: 0.2s;
-    }
-    .icon-btn-left:hover, .icon-btn-right:hover { color: var(--primary-glow); }
-
-    .listening { color: #ff4b2b !important; animation: pulse 1.5s infinite; }
-    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-
-    .footer-credit {
-      font-size: 0.6rem;
-      color: #64748b;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      font-weight: 600;
-    }
-
-    .menu-toggle { position: fixed; top: 15px; left: 15px; z-index: 1100; cursor: pointer; background: #000; padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border); }
-    .bar { width: 20px; height: 2px; background: var(--primary-glow); margin: 4px 0; }
-    #welcome-bg { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); text-align: center; opacity: 1; transition: 0.5s; z-index: 1; }
-    #welcome-bg h1 { font-size: 3rem; background: linear-gradient(#fff, #444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .modal { position: fixed; inset: 0; background: #000; display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 20px; }
-    .modal-content { background: #111; padding: 30px; border-radius: 15px; width: 100%; max-width: 350px; border: 1px solid var(--glass-border); text-align: center; }
-    .hidden { display: none !important; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-  </style>
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
 </head>
 <body>
 
-<div class="menu-toggle" onclick="toggleSidebar()">
-  <div class="bar"></div>
-  <div class="bar"></div>
-  <div class="bar"></div>
-</div>
+    <button id="menu-btn" aria-label="Open Menu">☰</button>
 
-<div class="modal" id="loginPage">
-  <div class="modal-content">
-    <h2 style="margin-bottom: 20px; color: var(--primary-glow);">BOSS AI LOGIN</h2>
-    <input id="username" placeholder="Username" style="width:100%; margin-bottom:10px; padding:12px; border-radius:8px; border:1px solid #333; background:#000; color:#fff;">
-    <input id="password" type="password" placeholder="Access Code" style="width:100%; margin-bottom:20px; padding:12px; border-radius:8px; border:1px solid #333; background:#000; color:#fff;">
-    <button class="btn-sidebar" style="background:var(--primary-glow); color:#000; width:100%; font-weight:bold; justify-content:center;" onclick="login()">ENTER SYSTEM</button>
-  </div>
-</div>
+    <nav id="sidebar" class="sidebar">
+        <button id="close-btn" class="close-btn" aria-label="Close Menu">✕</button>
+        <ul>
+            <li class="menu-item">🏠 &nbsp; Home</li>
+            <li class="menu-item">👤 &nbsp; Profile</li>
+            <li class="menu-item">⚙️ &nbsp; Settings</li>
+            <li class="menu-item">📞 &nbsp; Contact</li>
+        </ul>
+    </nav>
 
-<div class="sidebar" id="sidebar">
-  <div class="sidebar-top">
-    <h2 style="color: var(--primary-glow); margin-bottom:20px;">BOSS AI</h2>
-    <button class="btn-sidebar" onclick="newChat()"><span>+</span> New Session</button>
-    <button class="btn-sidebar"><span>🔍</span> Search Chats</button>
-    <button class="btn-sidebar"><span>🖼️</span> Images</button>
-    <button class="btn-sidebar"><span>🧩</span> Apps</button>
-    <button class="btn-sidebar" style="border-color: var(--secondary-glow);"><span>🧪</span> Deep Research</button>
-  </div>
-  <div class="sidebar-bottom">
-    <button class="btn-sidebar"><span>💳</span> See Plans & Pricing</button>
-    <button class="btn-sidebar" onclick="toggleSettings(true)"><span>⚙️</span> Settings</button>
-    <button class="btn-sidebar"><span>❓</span> Help</button>
-  </div>
-</div>
+    <div id="overlay" class="overlay"></div>
 
-<div class="main">
-  <div id="welcome-bg">
-    <h1>BOSS AI</h1>
-    <p style="color:var(--secondary-glow)">Ready for Commands</p>
-  </div>
+    <script>
+        const menuBtn = document.getElementById("menu-btn");
+        const closeBtn = document.getElementById("close-btn");
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("overlay");
 
-  <div class="chat-box" id="chatBox">
-    <div class="message-container" id="messageContainer"></div>
-  </div>
+        const toggleSidebar = (isOpen) => {
+            sidebar.classList.toggle("open", isOpen);
+            overlay.classList.toggle("active", isOpen);
+        };
 
-  <div class="bottom-wrapper">
-    <div class="input-container">
-      <label class="icon-btn-left" title="Upload">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-        <input type="file" id="fileInput" hidden accept=".txt,.pdf,image/*,audio/*,video/*">
-      </label>
-
-      <input id="userInput" placeholder="Ask anything..." onkeypress="if(event.key==='Enter') sendMessage()">
-      
-      <div id="micBtn" class="icon-btn-right" onclick="toggleVoice()" title="Voice Input">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-          <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
-          <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
-        </svg>
-      </div>
-
-      <button class="send-btn" onclick="sendMessage()">
-        <svg viewBox="0 0 24 24" style="width:18px; height:18px; fill:#000;"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
-      </button>
-    </div>
-    <div class="footer-credit">Developed by Bhupendra Saini</div>
-  </div>
-</div>
-
-<div id="settingsPanel" class="modal hidden">
-  <div class="modal-content">
-    <h3 style="color:#fff; margin-bottom:15px;">API Settings</h3>
-    <input id="apiInput" type="password" placeholder="sk-or-v1-..." style="width:100%; margin-bottom:15px; padding:12px; border-radius:8px; background:#000; color:#fff; border:1px solid #333;">
-    <button class="btn-sidebar" style="background:var(--accent); color:#000; width:100%; justify-content:center;" onclick="saveAPI()">SAVE KEY</button>
-    <button class="btn-sidebar" style="color:#fff; width:100%; border:none; background:transparent; justify-content:center;" onclick="toggleSettings(false)">Close</button>
-  </div>
-</div>
-
-<script>
-  let API_KEY = localStorage.getItem("api_key") || "";
-  let currentUser = localStorage.getItem("user") || null;
-
-  // Voice Logic
-  const micBtn = document.getElementById('micBtn');
-  const userInput = document.getElementById('userInput');
-  let isListening = false;
-  const recognition = (window.SpeechRecognition || window.webkitSpeechRecognition) ? new (window.SpeechRecognition || window.webkitSpeechRecognition)() : null;
-
-  if (recognition) {
-    recognition.onstart = () => { isListening = true; micBtn.classList.add('listening'); };
-    recognition.onresult = (e) => { userInput.value = e.results[0][0].transcript; };
-    recognition.onend = () => { isListening = false; micBtn.classList.remove('listening'); };
-  }
-
-  function toggleVoice() {
-    if(!recognition) return alert("Speech not supported");
-    isListening ? recognition.stop() : recognition.start();
-  }
-
-  function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
-  function toggleSettings(show) { document.getElementById('settingsPanel').classList.toggle('hidden', !show); }
-  function saveAPI() { const v = document.getElementById('apiInput').value; if(v){ API_KEY=v; localStorage.setItem("api_key", v); toggleSettings(false); } }
-
-  function login() {
-    if(document.getElementById('password').value === "bhupi2026") {
-      currentUser = document.getElementById('username').value;
-      localStorage.setItem("user", currentUser);
-      document.getElementById('loginPage').classList.add('hidden');
-    } else alert("Wrong Code");
-  }
-
-  function newChat() {
-    document.getElementById('messageContainer').innerHTML = '';
-    document.getElementById('welcome-bg').style.opacity = '1';
-    if(window.innerWidth < 1024) toggleSidebar();
-  }
-
-  async function sendMessage() {
-    const text = userInput.value.trim();
-    if(!text || !API_KEY) { if(!API_KEY) toggleSettings(true); return; }
-    document.getElementById('welcome-bg').style.opacity = '0';
-    addMessage(text, 'user');
-    userInput.value = '';
-    const botDiv = addMessage("Thinking...", 'bot');
-    try {
-      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: { "Authorization": `Bearer ${API_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ model: "openai/gpt-3.5-turbo", messages: [{role: "user", content: text}] })
-      });
-      const data = await res.json();
-      botDiv.textContent = data.choices[0].message.content;
-    } catch(e) { botDiv.textContent = "Error."; }
-    document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
-  }
-
-  function addMessage(text, sender) {
-    const div = document.createElement('div');
-    div.className = `message ${sender}`;
-    div.textContent = text;
-    document.getElementById('messageContainer').appendChild(div);
-    document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
-    return div;
-  }
-
-  window.onload = () => { if(currentUser) document.getElementById('loginPage').classList.add('hidden'); };
-  document.getElementById('fileInput').onchange = function() { if(this.files.length) addMessage(`📎 Attached: ${this.files[0].name}`, 'user'); };
-</script>
+        menuBtn.addEventListener("click", () => toggleSidebar(true));
+        closeBtn.addEventListener("click", () => toggleSidebar(false));
+        overlay.addEventListener("click", () => toggleSidebar(false));
+    </script>
 
 </body>
 </html>
