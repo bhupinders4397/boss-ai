@@ -117,6 +117,7 @@
     .user { background: var(--user-msg); align-self: flex-end; border-bottom-right-radius: 2px; }
     .bot { background: var(--bot-msg); align-self: flex-start; border-bottom-left-radius: 2px; border: 1px solid var(--glass-border); }
 
+    /* --- INPUT SECTION --- */
     .bottom-wrapper {
       position: fixed;
       bottom: 0;
@@ -138,16 +139,31 @@
       max-width: 800px;
       width: 100%;
       display: flex;
+      align-items: center;
       background: rgba(30, 32, 45, 0.95);
       border: 1px solid var(--glass-border);
       border-radius: 25px;
-      padding: 6px 6px 6px 18px;
+      padding: 6px 12px;
       backdrop-filter: blur(15px);
       margin-bottom: 8px;
     }
 
-    input { flex: 1; border: none; background: transparent; color: white; outline: none; font-size: 1rem; }
+    input { flex: 1; border: none; background: transparent; color: white; outline: none; font-size: 1rem; padding: 10px; }
     
+    .icon-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      color: #64748b;
+      transition: 0.2s;
+    }
+
+    .icon-btn:hover { color: var(--primary-glow); }
+
     .send-btn {
       background: var(--primary-glow);
       border: none;
@@ -158,6 +174,19 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      margin-left: 5px;
+    }
+
+    /* Mic pulse animation */
+    .listening {
+      color: #ff4b2b !important;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.7; }
+      100% { transform: scale(1); opacity: 1; }
     }
 
     .footer-credit {
@@ -170,15 +199,12 @@
 
     .menu-toggle { position: fixed; top: 15px; left: 15px; z-index: 1100; cursor: pointer; background: #000; padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border); }
     .bar { width: 20px; height: 2px; background: var(--primary-glow); margin: 4px 0; }
-    #welcome-bg { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); text-align: center; opacity: 1; transition: 0.5s; z-index: 1; pointer-events: none; }
+    #welcome-bg { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); text-align: center; opacity: 1; transition: 0.5s; z-index: 1; }
     #welcome-bg h1 { font-size: 3rem; background: linear-gradient(#fff, #444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .modal { position: fixed; inset: 0; background: #000; display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 20px; }
     .modal-content { background: #111; padding: 30px; border-radius: 15px; width: 100%; max-width: 350px; border: 1px solid var(--glass-border); text-align: center; }
     .hidden { display: none !important; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-    
-    /* Styling for the AI generated image */
-    .ai-img { width: 100%; border-radius: 12px; margin-top: 10px; border: 1px solid var(--glass-border); }
   </style>
 </head>
 <body>
@@ -201,10 +227,9 @@
 <div class="sidebar" id="sidebar">
   <div class="sidebar-top">
     <h2 style="color: var(--primary-glow); margin-bottom:20px;">BOSS AI</h2>
-    
     <button class="btn-sidebar" onclick="newChat()"><span>+</span> New Session</button>
     <button class="btn-sidebar"><span>🔍</span> Search Chats</button>
-    <button class="btn-sidebar" onclick="generateImagePrompt()"><span>🖼️</span> Images</button>
+    <button class="btn-sidebar"><span>🖼️</span> Images</button>
     <button class="btn-sidebar"><span>🧩</span> Apps</button>
     <button class="btn-sidebar" style="border-color: var(--secondary-glow);"><span>🧪</span> Deep Research</button>
   </div>
@@ -228,7 +253,20 @@
 
   <div class="bottom-wrapper">
     <div class="input-container">
+      <label class="icon-btn" title="Upload Files">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+        <input type="file" id="fileInput" hidden accept=".txt,.pdf,image/*,audio/*,video/*">
+      </label>
+
       <input id="userInput" placeholder="Ask anything..." onkeypress="if(event.key==='Enter') sendMessage()">
+      
+      <button id="micBtn" class="icon-btn" onclick="toggleVoice()" title="Voice Input">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+          <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+          <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+        </svg>
+      </button>
+
       <button class="send-btn" onclick="sendMessage()">
         <svg viewBox="0 0 24 24" style="width:18px; height:18px; fill:#000;"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
       </button>
@@ -249,6 +287,54 @@
 <script>
   let API_KEY = localStorage.getItem("api_key") || "";
   let currentUser = localStorage.getItem("user") || null;
+  
+  // Voice Recognition Logic
+  const micBtn = document.getElementById('micBtn');
+  const userInput = document.getElementById('userInput');
+  let isListening = false;
+  
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = SpeechRecognition ? new SpeechRecognition() : null;
+
+  if (recognition) {
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    recognition.onstart = () => {
+      isListening = true;
+      micBtn.classList.add('listening');
+      userInput.placeholder = "Listening...";
+    };
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      userInput.value = transcript;
+    };
+
+    recognition.onend = () => {
+      isListening = false;
+      micBtn.classList.remove('listening');
+      userInput.placeholder = "Ask anything...";
+    };
+
+    recognition.onerror = () => {
+      isListening = false;
+      micBtn.classList.remove('listening');
+    };
+  }
+
+  function toggleVoice() {
+    if (!recognition) {
+      alert("Your browser does not support Speech Recognition.");
+      return;
+    }
+    if (isListening) {
+      recognition.stop();
+    } else {
+      recognition.start();
+    }
+  }
 
   function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
   function toggleSettings(show) { document.getElementById('settingsPanel').classList.toggle('hidden', !show); }
@@ -269,43 +355,13 @@
     if(window.innerWidth < 1024) toggleSidebar();
   }
 
-  // --- NEW: Image Generation Trigger ---
-  function generateImagePrompt() {
-    const userPrompt = prompt("Describe the image you want Boss AI to create:");
-    if (!userPrompt) return;
-
-    if(window.innerWidth < 1024) toggleSidebar();
-    document.getElementById('welcome-bg').style.opacity = '0';
-    
-    addMessage(`Generate Image: ${userPrompt}`, 'user');
-    const botDiv = addMessage("Initializing creative core... generating image...", 'bot');
-
-    // Using Pollinations AI (Free, high-quality, no key required)
-    const seed = Math.floor(Math.random() * 1000000);
-    const imageUrl = `https://pollinations.ai/p/${encodeURIComponent(userPrompt)}?width=1024&height=1024&seed=${seed}&model=flux`;
-
-    // Add a small timeout to simulate "creation"
-    setTimeout(() => {
-      botDiv.innerHTML = `
-        <div style="display:flex; flex-direction:column; gap:8px;">
-          <span>Here is your generated image:</span>
-          <img src="${imageUrl}" class="ai-img" alt="AI Image" onclick="window.open(this.src, '_blank')">
-          <small style="opacity:0.5; font-size:0.7rem;">Click image to expand</small>
-        </div>
-      `;
-      const cb = document.getElementById('chatBox');
-      cb.scrollTop = cb.scrollHeight;
-    }, 1500);
-  }
-
   async function sendMessage() {
-    const input = document.getElementById('userInput');
-    const text = input.value.trim();
+    const text = userInput.value.trim();
     if(!text || !API_KEY) { if(!API_KEY) toggleSettings(true); return; }
 
     document.getElementById('welcome-bg').style.opacity = '0';
     addMessage(text, 'user');
-    input.value = '';
+    userInput.value = '';
 
     const botDiv = addMessage("Thinking...", 'bot');
 
@@ -319,7 +375,7 @@
         })
       });
       const data = await res.json();
-      botDiv.innerHTML = data.choices[0].message.content;
+      botDiv.textContent = data.choices[0].message.content;
     } catch(e) { botDiv.textContent = "Error connecting to AI."; }
     
     const cb = document.getElementById('chatBox');
@@ -329,7 +385,7 @@
   function addMessage(text, sender) {
     const div = document.createElement('div');
     div.className = `message ${sender}`;
-    div.innerHTML = text; // Using innerHTML to support images/formatting
+    div.textContent = text;
     document.getElementById('messageContainer').appendChild(div);
     const cb = document.getElementById('chatBox');
     cb.scrollTop = cb.scrollHeight;
@@ -337,6 +393,13 @@
   }
 
   window.onload = () => { if(currentUser) document.getElementById('loginPage').classList.add('hidden'); };
+
+  // Handle File upload notification
+  document.getElementById('fileInput').onchange = function() {
+    if(this.files.length > 0) {
+      addMessage(`📎 Attachment selected: ${this.files[0].name}`, 'user');
+    }
+  };
 </script>
 
 </body>
