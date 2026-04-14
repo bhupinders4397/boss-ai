@@ -112,12 +112,11 @@
       font-size: 0.95rem;
       line-height: 1.4;
       animation: fadeIn 0.3s ease;
-      word-wrap: break-word;
     }
     .user { background: var(--user-msg); align-self: flex-end; border-bottom-right-radius: 2px; }
     .bot { background: var(--bot-msg); align-self: flex-start; border-bottom-left-radius: 2px; border: 1px solid var(--glass-border); }
 
-    /* --- INPUT SECTION --- */
+    /* --- FIXED INPUT SECTION --- */
     .bottom-wrapper {
       position: fixed;
       bottom: 0;
@@ -139,31 +138,18 @@
       max-width: 800px;
       width: 100%;
       display: flex;
-      align-items: center;
       background: rgba(30, 32, 45, 0.95);
       border: 1px solid var(--glass-border);
       border-radius: 25px;
-      padding: 6px 12px;
+      padding: 6px 6px 6px 18px; /* Restored original padding */
       backdrop-filter: blur(15px);
       margin-bottom: 8px;
-    }
-
-    input { flex: 1; border: none; background: transparent; color: white; outline: none; font-size: 1rem; padding: 10px; }
-    
-    .icon-btn {
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      display: flex;
       align-items: center;
-      justify-content: center;
-      padding: 8px;
-      color: #64748b;
-      transition: 0.2s;
     }
 
-    .icon-btn:hover { color: var(--primary-glow); }
-
+    input { flex: 1; border: none; background: transparent; color: white; outline: none; font-size: 1rem; }
+    
+    /* Restored original Send Button style */
     .send-btn {
       background: var(--primary-glow);
       border: none;
@@ -174,20 +160,29 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-left: 5px;
     }
 
-    /* Mic pulse animation */
-    .listening {
-      color: #ff4b2b !important;
-      animation: pulse 1.5s infinite;
+    /* Minimalist styling for new icons */
+    .icon-btn-left {
+      cursor: pointer;
+      margin-right: 12px;
+      display: flex;
+      align-items: center;
+      color: #64748b;
+      transition: 0.2s;
     }
+    .icon-btn-right {
+      cursor: pointer;
+      margin-right: 8px;
+      display: flex;
+      align-items: center;
+      color: #64748b;
+      transition: 0.2s;
+    }
+    .icon-btn-left:hover, .icon-btn-right:hover { color: var(--primary-glow); }
 
-    @keyframes pulse {
-      0% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.2); opacity: 0.7; }
-      100% { transform: scale(1); opacity: 1; }
-    }
+    .listening { color: #ff4b2b !important; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
     .footer-credit {
       font-size: 0.6rem;
@@ -233,7 +228,6 @@
     <button class="btn-sidebar"><span>🧩</span> Apps</button>
     <button class="btn-sidebar" style="border-color: var(--secondary-glow);"><span>🧪</span> Deep Research</button>
   </div>
-
   <div class="sidebar-bottom">
     <button class="btn-sidebar"><span>💳</span> See Plans & Pricing</button>
     <button class="btn-sidebar" onclick="toggleSettings(true)"><span>⚙️</span> Settings</button>
@@ -253,19 +247,19 @@
 
   <div class="bottom-wrapper">
     <div class="input-container">
-      <label class="icon-btn" title="Upload Files">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      <label class="icon-btn-left" title="Upload">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
         <input type="file" id="fileInput" hidden accept=".txt,.pdf,image/*,audio/*,video/*">
       </label>
 
       <input id="userInput" placeholder="Ask anything..." onkeypress="if(event.key==='Enter') sendMessage()">
       
-      <button id="micBtn" class="icon-btn" onclick="toggleVoice()" title="Voice Input">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+      <div id="micBtn" class="icon-btn-right" onclick="toggleVoice()" title="Voice Input">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
           <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
           <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
         </svg>
-      </button>
+      </div>
 
       <button class="send-btn" onclick="sendMessage()">
         <svg viewBox="0 0 24 24" style="width:18px; height:18px; fill:#000;"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
@@ -287,53 +281,22 @@
 <script>
   let API_KEY = localStorage.getItem("api_key") || "";
   let currentUser = localStorage.getItem("user") || null;
-  
-  // Voice Recognition Logic
+
+  // Voice Logic
   const micBtn = document.getElementById('micBtn');
   const userInput = document.getElementById('userInput');
   let isListening = false;
-  
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const recognition = SpeechRecognition ? new SpeechRecognition() : null;
+  const recognition = (window.SpeechRecognition || window.webkitSpeechRecognition) ? new (window.SpeechRecognition || window.webkitSpeechRecognition)() : null;
 
   if (recognition) {
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.lang = 'en-US';
-
-    recognition.onstart = () => {
-      isListening = true;
-      micBtn.classList.add('listening');
-      userInput.placeholder = "Listening...";
-    };
-
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      userInput.value = transcript;
-    };
-
-    recognition.onend = () => {
-      isListening = false;
-      micBtn.classList.remove('listening');
-      userInput.placeholder = "Ask anything...";
-    };
-
-    recognition.onerror = () => {
-      isListening = false;
-      micBtn.classList.remove('listening');
-    };
+    recognition.onstart = () => { isListening = true; micBtn.classList.add('listening'); };
+    recognition.onresult = (e) => { userInput.value = e.results[0][0].transcript; };
+    recognition.onend = () => { isListening = false; micBtn.classList.remove('listening'); };
   }
 
   function toggleVoice() {
-    if (!recognition) {
-      alert("Your browser does not support Speech Recognition.");
-      return;
-    }
-    if (isListening) {
-      recognition.stop();
-    } else {
-      recognition.start();
-    }
+    if(!recognition) return alert("Speech not supported");
+    isListening ? recognition.stop() : recognition.start();
   }
 
   function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
@@ -341,12 +304,11 @@
   function saveAPI() { const v = document.getElementById('apiInput').value; if(v){ API_KEY=v; localStorage.setItem("api_key", v); toggleSettings(false); } }
 
   function login() {
-    const p = document.getElementById('password').value;
-    if(p === "bhupi2026") {
+    if(document.getElementById('password').value === "bhupi2026") {
       currentUser = document.getElementById('username').value;
       localStorage.setItem("user", currentUser);
       document.getElementById('loginPage').classList.add('hidden');
-    } else { alert("Wrong Code"); }
+    } else alert("Wrong Code");
   }
 
   function newChat() {
@@ -358,28 +320,20 @@
   async function sendMessage() {
     const text = userInput.value.trim();
     if(!text || !API_KEY) { if(!API_KEY) toggleSettings(true); return; }
-
     document.getElementById('welcome-bg').style.opacity = '0';
     addMessage(text, 'user');
     userInput.value = '';
-
     const botDiv = addMessage("Thinking...", 'bot');
-
     try {
       const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: { "Authorization": `Bearer ${API_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "openai/gpt-3.5-turbo",
-          messages: [{role: "user", content: text}]
-        })
+        body: JSON.stringify({ model: "openai/gpt-3.5-turbo", messages: [{role: "user", content: text}] })
       });
       const data = await res.json();
       botDiv.textContent = data.choices[0].message.content;
-    } catch(e) { botDiv.textContent = "Error connecting to AI."; }
-    
-    const cb = document.getElementById('chatBox');
-    cb.scrollTop = cb.scrollHeight;
+    } catch(e) { botDiv.textContent = "Error."; }
+    document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
   }
 
   function addMessage(text, sender) {
@@ -387,19 +341,12 @@
     div.className = `message ${sender}`;
     div.textContent = text;
     document.getElementById('messageContainer').appendChild(div);
-    const cb = document.getElementById('chatBox');
-    cb.scrollTop = cb.scrollHeight;
+    document.getElementById('chatBox').scrollTop = document.getElementById('chatBox').scrollHeight;
     return div;
   }
 
   window.onload = () => { if(currentUser) document.getElementById('loginPage').classList.add('hidden'); };
-
-  // Handle File upload notification
-  document.getElementById('fileInput').onchange = function() {
-    if(this.files.length > 0) {
-      addMessage(`📎 Attachment selected: ${this.files[0].name}`, 'user');
-    }
-  };
+  document.getElementById('fileInput').onchange = function() { if(this.files.length) addMessage(`📎 Attached: ${this.files[0].name}`, 'user'); };
 </script>
 
 </body>
