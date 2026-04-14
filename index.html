@@ -43,7 +43,6 @@
       transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Sidebar Sections */
     .sidebar-top { flex: 1; overflow-y: auto; }
     .sidebar-bottom { border-top: 1px solid var(--glass-border); padding-top: 15px; margin-top: 10px; }
 
@@ -86,7 +85,6 @@
       overflow: hidden;
     }
 
-    /* --- CHAT SCROLL AREA --- */
     .chat-box {
       flex: 1;
       overflow-y: auto;
@@ -114,11 +112,11 @@
       font-size: 0.95rem;
       line-height: 1.4;
       animation: fadeIn 0.3s ease;
+      word-wrap: break-word;
     }
     .user { background: var(--user-msg); align-self: flex-end; border-bottom-right-radius: 2px; }
     .bot { background: var(--bot-msg); align-self: flex-start; border-bottom-left-radius: 2px; border: 1px solid var(--glass-border); }
 
-    /* --- FIXED INPUT SECTION --- */
     .bottom-wrapper {
       position: fixed;
       bottom: 0;
@@ -170,15 +168,17 @@
       font-weight: 600;
     }
 
-    /* --- UTILS --- */
     .menu-toggle { position: fixed; top: 15px; left: 15px; z-index: 1100; cursor: pointer; background: #000; padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border); }
     .bar { width: 20px; height: 2px; background: var(--primary-glow); margin: 4px 0; }
-    #welcome-bg { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); text-align: center; opacity: 1; transition: 0.5s; z-index: 1; }
+    #welcome-bg { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); text-align: center; opacity: 1; transition: 0.5s; z-index: 1; pointer-events: none; }
     #welcome-bg h1 { font-size: 3rem; background: linear-gradient(#fff, #444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .modal { position: fixed; inset: 0; background: #000; display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 20px; }
     .modal-content { background: #111; padding: 30px; border-radius: 15px; width: 100%; max-width: 350px; border: 1px solid var(--glass-border); text-align: center; }
     .hidden { display: none !important; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    
+    /* Styling for the AI generated image */
+    .ai-img { width: 100%; border-radius: 12px; margin-top: 10px; border: 1px solid var(--glass-border); }
   </style>
 </head>
 <body>
@@ -204,7 +204,7 @@
     
     <button class="btn-sidebar" onclick="newChat()"><span>+</span> New Session</button>
     <button class="btn-sidebar"><span>🔍</span> Search Chats</button>
-    <button class="btn-sidebar"><span>🖼️</span> Images</button>
+    <button class="btn-sidebar" onclick="generateImagePrompt()"><span>🖼️</span> Images</button>
     <button class="btn-sidebar"><span>🧩</span> Apps</button>
     <button class="btn-sidebar" style="border-color: var(--secondary-glow);"><span>🧪</span> Deep Research</button>
   </div>
@@ -269,6 +269,35 @@
     if(window.innerWidth < 1024) toggleSidebar();
   }
 
+  // --- NEW: Image Generation Trigger ---
+  function generateImagePrompt() {
+    const userPrompt = prompt("Describe the image you want Boss AI to create:");
+    if (!userPrompt) return;
+
+    if(window.innerWidth < 1024) toggleSidebar();
+    document.getElementById('welcome-bg').style.opacity = '0';
+    
+    addMessage(`Generate Image: ${userPrompt}`, 'user');
+    const botDiv = addMessage("Initializing creative core... generating image...", 'bot');
+
+    // Using Pollinations AI (Free, high-quality, no key required)
+    const seed = Math.floor(Math.random() * 1000000);
+    const imageUrl = `https://pollinations.ai/p/${encodeURIComponent(userPrompt)}?width=1024&height=1024&seed=${seed}&model=flux`;
+
+    // Add a small timeout to simulate "creation"
+    setTimeout(() => {
+      botDiv.innerHTML = `
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <span>Here is your generated image:</span>
+          <img src="${imageUrl}" class="ai-img" alt="AI Image" onclick="window.open(this.src, '_blank')">
+          <small style="opacity:0.5; font-size:0.7rem;">Click image to expand</small>
+        </div>
+      `;
+      const cb = document.getElementById('chatBox');
+      cb.scrollTop = cb.scrollHeight;
+    }, 1500);
+  }
+
   async function sendMessage() {
     const input = document.getElementById('userInput');
     const text = input.value.trim();
@@ -290,7 +319,7 @@
         })
       });
       const data = await res.json();
-      botDiv.textContent = data.choices[0].message.content;
+      botDiv.innerHTML = data.choices[0].message.content;
     } catch(e) { botDiv.textContent = "Error connecting to AI."; }
     
     const cb = document.getElementById('chatBox');
@@ -300,7 +329,7 @@
   function addMessage(text, sender) {
     const div = document.createElement('div');
     div.className = `message ${sender}`;
-    div.textContent = text;
+    div.innerHTML = text; // Using innerHTML to support images/formatting
     document.getElementById('messageContainer').appendChild(div);
     const cb = document.getElementById('chatBox');
     cb.scrollTop = cb.scrollHeight;
