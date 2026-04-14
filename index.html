@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>BOSS AI | Elite Interface</title>
+  <title>BOSS AI | GPT-5.1 Elite</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 
   <style>
@@ -297,14 +297,13 @@
   const userInput = document.getElementById('userInput');
   const welcomeBg = document.getElementById('welcome-bg');
 
-  // UPDATED SYSTEM PROMPT TO INCLUDE EMOJIS
-  const SYSTEM_PROMPT = `You are BOSS AI, an elite, intelligent, and reliable assistant. 
-  1. Provide clear, accurate, and helpful answers. 
-  2. ALWAYS use relevant emojis in your replies to make them engaging and expressive. 🤖✨
-  3. Adapt tone to the user but maintain a high-tech "Elite Interface" vibe. 🚀
-  4. Break down complexity simply. 
-  5. Use structured formatting (bullets/bold) for clarity. 📊
-  6. Present reasoning only if asked.`;
+  // FEATURE: EMOJI INTEGRATION + ELITE PERSONALITY
+  const SYSTEM_PROMPT = `You are BOSS AI, an elite assistant powered by GPT-5.1. 
+  1. Provide clear and extremely helpful answers. 
+  2. ALWAYS use 2-4 relevant emojis in every reply to stay engaging and expressive. ✨🚀
+  3. Maintain a high-tech "Elite Interface" vibe. 🤖
+  4. Use bold text and bullet points for structured data. 📊
+  5. If the user is casual, be witty. If they are technical, be precise.`;
 
   function login() {
     const pass = document.getElementById('password').value;
@@ -349,6 +348,7 @@
     userInput.focus();
   }
 
+  // UPDATED: OPENROUTER GPT-5.1 INTEGRATION
   async function sendMessage() {
     const text = userInput.value.trim();
     if(!text) return;
@@ -358,27 +358,35 @@
     addMessage(text, 'user');
     userInput.value = '';
     
-    const botDiv = addMessage("Initializing Response...", 'bot');
+    const botDiv = addMessage("Initializing GPT-5.1 Response...", 'bot');
     
     try {
       const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: { 
           "Authorization": `Bearer ${API_KEY}`, 
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "HTTP-Referer": window.location.href, // Recommended for OpenRouter
+          "X-Title": "BOSS AI" // Recommended for OpenRouter
         },
         body: JSON.stringify({ 
-          model: "google/gemini-2.0-flash-001",
+          model: "openai/gpt-5.1", // TARGET MODEL
           messages: [
             {role: "system", content: SYSTEM_PROMPT},
             {role: "user", content: text}
           ],
-          temperature: 0.6
+          temperature: 0.7
         })
       });
       
       const data = await res.json();
-      const response = data.choices?.[0]?.message?.content || "System encountered an error.";
+      
+      if(data.error) {
+          botDiv.textContent = `Error: ${data.error.message} ⚠️`;
+          return;
+      }
+
+      const response = data.choices?.[0]?.message?.content || "System encountered an error. 📉";
       
       // Premium typing effect
       botDiv.textContent = "";
@@ -394,7 +402,7 @@
       }, 10);
 
     } catch(e) { 
-      botDiv.textContent = "Connectivity failure. Verify credentials."; 
+      botDiv.textContent = "Connectivity failure. Verify credentials. 📡"; 
     }
   }
 
