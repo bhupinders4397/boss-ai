@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>BOSS AI | Elite Interface</title>
+  <title>BOSS AI | Elite Universal Interface</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 
   <style>
@@ -75,6 +75,19 @@
 
     .btn-sidebar:hover { background: rgba(255,255,255,0.1); border-color: var(--primary-glow); }
 
+    /* Model Dropdown Style */
+    .model-selector {
+      width: 100%;
+      padding: 10px;
+      background: #000;
+      border: 1px solid var(--glass-border);
+      color: var(--primary-glow);
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 0.8rem;
+      outline: none;
+    }
+
     /* --- MAIN LAYOUT --- */
     .main {
       flex: 1;
@@ -118,7 +131,6 @@
     .user { background: var(--user-msg); align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2); }
     .bot { background: var(--bot-msg); align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); }
 
-    /* --- FIXED INPUT SECTION --- */
     .bottom-wrapper {
       position: fixed;
       bottom: 0;
@@ -230,17 +242,26 @@
 
 <div class="sidebar" id="sidebar">
   <div class="sidebar-top">
-    <h2 style="color: var(--primary-glow); margin-bottom:30px; font-weight: 800; letter-spacing: -1px;">BOSS AI</h2>
+    <h2 style="color: var(--primary-glow); margin-bottom:10px; font-weight: 800; letter-spacing: -1px;">BOSS AI</h2>
+    
+    <label style="font-size: 0.65rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; display: block;">Active Neural Engine</label>
+    <select id="modelSelector" class="model-selector">
+      <option value="google/gemma-4-26b-a4b-it">Gemma 4 26B (A4B)</option>
+      <option value="google/gemini-2.0-flash-001">Gemini 2.0 Flash</option>
+      <option value="openai/gpt-4o">GPT-4o (Standard)</option>
+      <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
+      <option value="meta-llama/llama-3.1-405b">Llama 3.1 405B</option>
+      <option value="openrouter/auto">Auto-Router (Best Price)</option>
+    </select>
+
     <button class="btn-sidebar" onclick="newChat()"><span>+</span> New Session</button>
     <button class="btn-sidebar"><span>🔍</span> History</button>
     <button class="btn-sidebar"><span>🖼️</span> Studio</button>
-    <button class="btn-sidebar"><span>🧩</span> Extensions</button>
-    <button class="btn-sidebar" style="border-color: var(--secondary-glow); color: var(--secondary-glow);"><span>🧪</span> Deep Research</button>
   </div>
   <div class="sidebar-bottom">
     <button class="btn-sidebar" onclick="toggleSettings(true)"><span>⚙️</span> Settings</button>
     <button class="btn-sidebar"><span>❓</span> Support</button>
-    <p style="font-size: 0.7rem; color: #444; margin-top: 10px; text-align: center;">v2.0.4 Premium</p>
+    <p style="font-size: 0.7rem; color: #444; margin-top: 10px; text-align: center;">v2.1.0 Universal</p>
   </div>
 </div>
 
@@ -296,15 +317,13 @@
   const messageContainer = document.getElementById('messageContainer');
   const userInput = document.getElementById('userInput');
   const welcomeBg = document.getElementById('welcome-bg');
+  const modelSelector = document.getElementById('modelSelector');
 
-  // UPDATED SYSTEM PROMPT TO INCLUDE EMOJIS
-  const SYSTEM_PROMPT = `You are BOSS AI, an elite, intelligent, and reliable assistant. 
-  1. Provide clear, accurate, and helpful answers. 
-  2. ALWAYS use relevant emojis in your replies to make them engaging and expressive. 🤖✨
-  3. Adapt tone to the user but maintain a high-tech "Elite Interface" vibe. 🚀
-  4. Break down complexity simply. 
-  5. Use structured formatting (bullets/bold) for clarity. 📊
-  6. Present reasoning only if asked.`;
+  const SYSTEM_PROMPT = `You are BOSS AI, an elite assistant.
+  1. Provide clear, helpful answers.
+  2. Use 2-4 relevant emojis in every reply. 🤖✨
+  3. Maintain an elite tech vibe. 🚀
+  4. Use bold text for key terms.`;
 
   function login() {
     const pass = document.getElementById('password').value;
@@ -314,12 +333,10 @@
       localStorage.setItem("user", currentUser);
       document.getElementById('loginPage').classList.add('hidden');
       userInput.focus();
-    } else {
-      alert("Access Denied");
-    }
+    } else { alert("Access Denied"); }
   }
 
-  // Voice Logic
+  // Voice Recognition
   const micBtn = document.getElementById('micBtn');
   let isListening = false;
   const recognition = (window.SpeechRecognition || window.webkitSpeechRecognition) ? new (window.SpeechRecognition || window.webkitSpeechRecognition)() : null;
@@ -354,33 +371,41 @@
     if(!text) return;
     if(!API_KEY) { toggleSettings(true); return; }
 
+    const selectedModel = modelSelector.value;
     welcomeBg.style.opacity = '0';
     addMessage(text, 'user');
     userInput.value = '';
     
-    const botDiv = addMessage("Initializing Response...", 'bot');
+    const botDiv = addMessage(`Neural Link: ${selectedModel.split('/')[1]} thinking...`, 'bot');
     
     try {
       const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: { 
           "Authorization": `Bearer ${API_KEY}`, 
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "HTTP-Referer": window.location.href,
+          "X-Title": "BOSS AI Universal"
         },
         body: JSON.stringify({ 
-          model: "google/gemini-2.0-flash-001",
+          model: selectedModel,
           messages: [
             {role: "system", content: SYSTEM_PROMPT},
             {role: "user", content: text}
           ],
-          temperature: 0.6
+          temperature: 0.7
         })
       });
       
       const data = await res.json();
-      const response = data.choices?.[0]?.message?.content || "System encountered an error.";
       
-      // Premium typing effect
+      if(data.error) {
+        botDiv.textContent = `API Error: ${data.error.message} ⚠️`;
+        return;
+      }
+
+      const response = data.choices?.[0]?.message?.content || "System Offline. 📉";
+      
       botDiv.textContent = "";
       let i = 0;
       const interval = setInterval(() => {
@@ -388,14 +413,10 @@
           botDiv.textContent += response.charAt(i);
           i++;
           chatBox.scrollTo(0, chatBox.scrollHeight);
-        } else {
-          clearInterval(interval);
-        }
+        } else { clearInterval(interval); }
       }, 10);
 
-    } catch(e) { 
-      botDiv.textContent = "Connectivity failure. Verify credentials."; 
-    }
+    } catch(e) { botDiv.textContent = "Global Connection Failure. 📡"; }
   }
 
   function addMessage(text, sender) {
@@ -408,8 +429,10 @@
   }
 
   userInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendMessage(); });
-  window.onload = () => { if(currentUser) document.getElementById('loginPage').classList.add('hidden'); };
-  document.getElementById('fileInput').onchange = function() { if(this.files.length) addMessage(`📎 File Linked: ${this.files[0].name}`, 'user'); };
+  window.onload = () => { 
+    if(currentUser) document.getElementById('loginPage').classList.add('hidden'); 
+    if(API_KEY) document.getElementById('apiInput').value = API_KEY;
+  };
 </script>
 
 </body>
