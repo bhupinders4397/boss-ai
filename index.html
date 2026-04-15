@@ -291,13 +291,15 @@
 <script>
   let API_KEY = localStorage.getItem("api_key") || "";
   let currentUser = localStorage.getItem("user") || null;
+  
+  // FIXED: Memory Storage
+  let chatHistory = []; 
 
   const chatBox = document.getElementById('chatBox');
   const messageContainer = document.getElementById('messageContainer');
   const userInput = document.getElementById('userInput');
   const welcomeBg = document.getElementById('welcome-bg');
 
-  // UPDATED SYSTEM PROMPT TO INCLUDE EMOJIS
   const SYSTEM_PROMPT = `You are BOSS AI, an elite, intelligent, and reliable assistant. 
   1. Provide clear, accurate, and helpful answers. 
   2. ALWAYS use relevant emojis in your replies to make them engaging and expressive. 🤖✨
@@ -344,6 +346,7 @@
 
   function newChat() {
     messageContainer.innerHTML = '';
+    chatHistory = []; // Clear memory for new session
     welcomeBg.style.opacity = '1';
     if(window.innerWidth < 1024) toggleSidebar();
     userInput.focus();
@@ -356,8 +359,11 @@
 
     welcomeBg.style.opacity = '0';
     addMessage(text, 'user');
-    userInput.value = '';
     
+    // Add to history
+    chatHistory.push({role: "user", content: text});
+    
+    userInput.value = '';
     const botDiv = addMessage("Initializing Response...", 'bot');
     
     try {
@@ -371,7 +377,7 @@
           model: "google/gemini-2.0-flash-001",
           messages: [
             {role: "system", content: SYSTEM_PROMPT},
-            {role: "user", content: text}
+            ...chatHistory // FIXED: Sends all previous messages
           ],
           temperature: 0.6
         })
@@ -380,7 +386,10 @@
       const data = await res.json();
       const response = data.choices?.[0]?.message?.content || "System encountered an error.";
       
-      // Premium typing effect
+      // Store AI response in history
+      chatHistory.push({role: "assistant", content: response});
+
+      // Typing effect
       botDiv.textContent = "";
       let i = 0;
       const interval = setInterval(() => {
