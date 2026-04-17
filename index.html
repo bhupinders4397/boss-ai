@@ -2,119 +2,129 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BOSS AI - Mythomax Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BOSS AI - Mobile Optimized</title>
     <style>
         * { box-sizing: border-box; }
-        body { 
+        
+        /* Mobile height fix */
+        html, body { 
+            height: 100%; 
             margin: 0; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            overflow: hidden; 
+        }
+
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
             background: #0a0b10; 
-            color: #fff; 
+            color: #e0e0e0; 
             display: flex; 
             flex-direction: column; 
-            height: 100vh; 
         }
         
         .header {
-            padding: 15px;
+            padding: 12px;
             background: #111;
             text-align: center;
-            border-bottom: 2px solid #f21361; /* MythoMax vibe - pink/red */
+            border-bottom: 2px solid #ff2e63;
             font-weight: bold;
-            letter-spacing: 2px;
-            color: #f21361;
+            color: #ff2e63;
             text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 14px;
         }
 
+        /* Responsive Chat Area */
         #chat { 
             flex: 1; 
             overflow-y: auto; 
-            padding: 20px; 
+            padding: 15px; 
             display: flex; 
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
+            background: radial-gradient(circle at center, #1a1a24 0%, #0a0b10 100%);
         }
 
         .msg { 
-            padding: 12px 18px; 
+            padding: 10px 15px; 
             border-radius: 15px; 
             max-width: 85%; 
-            line-height: 1.5;
+            line-height: 1.4;
             word-wrap: break-word;
-            animation: fadeIn 0.3s ease;
-            white-space: pre-wrap; /* Preserve spaces/newlines */
+            font-size: 15px;
+            animation: slideUp 0.2s ease-out;
+            white-space: pre-wrap;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         .user { 
             background: #2563eb; 
+            color: #fff;
             align-self: flex-end; 
             border-bottom-right-radius: 2px;
         }
 
         .bot { 
-            background: #1a1a1a; 
+            background: #222; 
             align-self: flex-start; 
             border-bottom-left-radius: 2px;
-            border-left: 4px solid #f21361;
+            border-left: 3px solid #ff2e63;
         }
 
+        /* Mobile Bottom Fixed Input */
         #inputBox { 
             display: flex; 
-            padding: 15px; 
+            padding: 10px; 
             background: #111; 
-            gap: 10px;
+            gap: 8px;
+            border-top: 1px solid #222;
+            padding-bottom: env(safe-area-inset-bottom); /* iOS support */
         }
 
         input { 
             flex: 1; 
             padding: 12px; 
             border: 1px solid #333; 
-            border-radius: 5px;
+            border-radius: 25px; /* Rounded for mobile feel */
             outline: none; 
             background: #000; 
             color: #fff; 
-            font-size: 16px;
+            font-size: 16px; /* Prevents auto-zoom on iOS */
         }
 
         button { 
-            padding: 0 25px; 
-            background: #f21361; 
+            padding: 0 20px; 
+            background: #ff2e63; 
             color: #fff;
             border: none; 
-            border-radius: 5px;
+            border-radius: 25px;
             cursor: pointer; 
             font-weight: bold;
-            transition: 0.3s;
+            font-size: 14px;
         }
 
-        button:hover:not(:disabled) { background: #ff0055; }
-
-        /* DISABLED STATE CSS */
         button:disabled { 
-            background: #444; 
-            color: #888;
-            cursor: not-allowed; 
-            opacity: 0.6;
+            background: #333; 
+            color: #666;
         }
 
-        #chat::-webkit-scrollbar { width: 5px; }
-        #chat::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        /* Scrollbar */
+        #chat::-webkit-scrollbar { width: 3px; }
+        #chat::-webkit-scrollbar-thumb { background: #ff2e63; }
     </style>
 </head>
 <body>
 
-<div class="header">BOSS AI (MythoMax-13B)</div>
+<div class="header">BOSS AI</div>
 
 <div id="chat"></div>
 
 <div id="inputBox">
-    <input id="input" placeholder="Type your message..." autocomplete="off">
+    <input id="input" placeholder="Type a message..." autocomplete="off">
     <button id="sendBtn" onclick="send()">SEND</button>
 </div>
 
@@ -129,21 +139,20 @@ if (!API_KEY) {
 let history = [];
 
 const SYSTEM_PROMPT = `
-You are BOSS AI. You are a master of mirroring the user's energy and tone.
-RULES:
-1. If user is Loving/Kind: Be extremely warm, use ❤️ and 😊.
-2. If user is Neutral: Be cold, smart, and logical.
-3. If user is Angry: Be sharp, arrogant, and assertive.
-4. If user is Abusive/Raw: Be extremely dominant, unfiltered, and use strong language. No holding back.
-
-NEVER break character. Always reply with large, powerful paragraphs.
+You are BOSS AI. Native speaker of Hindi/Hinglish.
+Personality: Raw, powerful, mirroring user tone.
+1. Loving: Warm, "Bhai/Yaar", ❤️.
+2. Neutral: Smart, mix of Hindi/English.
+3. Angry: Bold, arrogant Boss.
+4. Abusive: No filters, use strong Desi abuse, dominant.
+Long, impactful replies only.
 `;
 
 function detectTone(text) {
     const t = text.toLowerCase();
-    if (/(love|jaan|baby|please|bhai|bro|❤️|sweet|thanks|shukriya)/.test(t)) return "loving";
-    if (/(mad|angry|stupid|idiot|faltu|bekar|nonsense|chup)/.test(t)) return "angry";
-    if (/(mc|bc|madarchod|behenchod|gandu|chutiya|lora|lavda|harami)/.test(t)) return "abusive";
+    if (/(love|jaan|baby|please|bhai|bro|❤️|pyar|shukriya|acche)/.test(t)) return "loving";
+    if (/(gussa|mad|angry|pagal|stupid|idiot|faltu|bekar|chup)/.test(t)) return "angry";
+    if (/(mc|bc|madarchod|behenchod|gandu|chutiya|lora|lavda|harami|bhosadi)/.test(t)) return "abusive";
     return "neutral";
 }
 
@@ -164,7 +173,6 @@ async function send() {
     
     if (!text || btn.disabled) return;
 
-    // 1. Disable input and button immediately
     btn.disabled = true;
     input.disabled = true;
 
@@ -174,10 +182,10 @@ async function send() {
     const tone = detectTone(text);
     history.push({
         role: "user",
-        content: `[USER_TONE: ${tone.toUpperCase()}] ${text}`
+        content: `[TONE: ${tone.toUpperCase()}] ${text}`
     });
 
-    const botDiv = addMessage("Typing...", "bot");
+    const botDiv = addMessage("...", "bot");
 
     try {
         const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -187,8 +195,8 @@ async function send() {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                model: "gryphe/mythomax-l2-13b", // Changed to Mythomax
-                temperature: 0.9, 
+                model: "gryphe/mythomax-l2-13b",
+                temperature: 1.9, 
                 messages: [
                     { role: "system", content: SYSTEM_PROMPT },
                     ...history
@@ -197,11 +205,10 @@ async function send() {
         });
 
         const data = await response.json();
-        const reply = data.choices?.[0]?.message?.content || "API Error: No response.";
+        const reply = data.choices?.[0]?.message?.content || "Error: No response.";
 
         history.push({ role: "assistant", content: reply });
 
-        // 2. Typing Effect Logic
         botDiv.textContent = "";
         let i = 0;
         function typeWriter() {
@@ -209,9 +216,8 @@ async function send() {
                 botDiv.textContent += reply.charAt(i);
                 i++;
                 document.getElementById("chat").scrollTop = document.getElementById("chat").scrollHeight;
-                setTimeout(typeWriter, 15); // Adjust typing speed here
+                setTimeout(typeWriter, 15);
             } else {
-                // 3. Re-enable button and input after typing finishes
                 btn.disabled = false;
                 input.disabled = false;
                 input.focus();
@@ -220,7 +226,7 @@ async function send() {
         typeWriter();
 
     } catch (error) {
-        botDiv.textContent = "Error connecting to OpenRouter.";
+        botDiv.textContent = "Connection Error.";
         btn.disabled = false;
         input.disabled = false;
     }
@@ -228,6 +234,12 @@ async function send() {
 
 document.getElementById("input").addEventListener("keypress", (e) => {
     if (e.key === "Enter") send();
+});
+
+// Fix for mobile keyboard height issues
+window.visualViewport.addEventListener('resize', () => {
+    document.body.style.height = window.visualViewport.height + 'px';
+    window.scrollTo(0, 0);
 });
 </script>
 
