@@ -16,7 +16,6 @@
       --glass-border: rgba(255, 255, 255, 0.1);
       --user-msg: #2563eb;
       --bot-msg: rgba(255, 255, 255, 0.08);
-      --admin-color: #f59e0b;
     }
 
     * { margin:0; padding:0; box-sizing:border-box; font-family: 'Inter', sans-serif; }
@@ -40,21 +39,68 @@
       display: flex;
       flex-direction: column;
       border-right: 1px solid var(--glass-border);
-      z-index: 1000;
+      z-index: 1200; /* Higher than toggle */
       transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
+
+    .sidebar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .close-sidebar {
+      cursor: pointer;
+      color: #64748b;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+    }
+
+    .close-sidebar:hover { color: #ff4b2b; }
 
     .sidebar-top { flex: 1; overflow-y: auto; }
     .sidebar-bottom { border-top: 1px solid var(--glass-border); padding-top: 15px; margin-top: 10px; }
 
     @media (min-width: 1024px) {
       .sidebar { position: relative; transform: translateX(0) !important; }
-      .menu-toggle { display: none !important; }
+      .menu-toggle, .close-sidebar { display: none !important; }
     }
 
     @media (max-width: 1023px) {
       .sidebar { position: fixed; left: 0; top: 0; transform: translateX(-100%); }
       .sidebar.active { transform: translateX(0); box-shadow: 20px 0 50px rgba(0,0,0,0.5); }
+    }
+
+    /* --- BRAIN MENU BUTTON --- */
+    .menu-toggle { 
+      position: fixed; 
+      top: 15px; 
+      left: 15px; 
+      z-index: 1100; 
+      cursor: pointer; 
+      background: rgba(0,0,0,0.6); 
+      padding: 8px; 
+      border-radius: 12px; 
+      border: 1px solid var(--glass-border); 
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    /* Hide brain when sidebar is active */
+    .sidebar.active ~ .menu-toggle {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.8);
+    }
+
+    .brain-svg {
+      fill: var(--primary-glow);
+      filter: drop-shadow(0 0 5px var(--primary-glow));
     }
 
     .btn-sidebar {
@@ -119,7 +165,6 @@
     .user { background: var(--user-msg); align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2); }
     .bot { background: var(--bot-msg); align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); }
 
-    /* --- FIXED INPUT SECTION --- */
     .bottom-wrapper {
       position: fixed;
       bottom: 0;
@@ -168,6 +213,23 @@
       transition: transform 0.2s;
     }
 
+    .send-btn:active { transform: scale(0.9); }
+
+    .icon-btn-left, .icon-btn-right {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      color: #64748b;
+      transition: 0.2s;
+    }
+    .icon-btn-left { margin-right: 12px; }
+    .icon-btn-right { margin-right: 8px; }
+    .icon-btn-left:hover, .icon-btn-right:hover { color: var(--primary-glow); }
+
+    .listening { color: #ff4b2b !important; animation: pulse 1.5s infinite; }
+    
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+
     .footer-credit {
       font-size: 0.6rem;
       color: #64748b;
@@ -176,9 +238,6 @@
       font-weight: 600;
       margin-top: 5px;
     }
-
-    .menu-toggle { position: fixed; top: 15px; left: 15px; z-index: 1100; cursor: pointer; background: rgba(0,0,0,0.6); padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); }
-    .bar { width: 20px; height: 2px; background: var(--primary-glow); margin: 4px 0; }
     
     #welcome-bg { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); text-align: center; opacity: 1; transition: 0.8s; z-index: 1; width: 100%; pointer-events: none; }
     #welcome-bg h1 { font-size: clamp(2.5rem, 8vw, 4rem); font-weight: 800; background: linear-gradient(to bottom, #fff, #666); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -2px; }
@@ -187,17 +246,76 @@
     .modal-content { background: #111; padding: 40px 30px; border-radius: 24px; width: 100%; max-width: 400px; border: 1px solid var(--glass-border); text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
     .hidden { display: none !important; }
     
-    .admin-badge { background: var(--admin-color); color: black; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-left: 5px; }
-
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
   </style>
 </head>
 <body>
 
-<div class="menu-toggle" onclick="toggleSidebar()">
-  <div class="bar"></div>
-  <div class="bar"></div>
-  <div class="bar"></div>
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h2 style="color: var(--primary-glow); font-weight: 800; letter-spacing: -1px;">BOSS AI</h2>
+    <div class="close-sidebar" onclick="toggleSidebar()">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </div>
+  </div>
+
+  <div class="sidebar-top">
+    <button class="btn-sidebar" onclick="newChat()"><span>+</span> New Session</button>
+    <button class="btn-sidebar"><span>🔍</span> History</button>
+    <button class="btn-sidebar"><span>🖼️</span> Studio</button>
+    <button class="btn-sidebar"><span>🧩</span> Extensions</button>
+    <button class="btn-sidebar" style="border-color: var(--secondary-glow); color: var(--secondary-glow);"><span>🧪</span> Deep Research</button>
+  </div>
+  <div class="sidebar-bottom">
+    <button class="btn-sidebar" onclick="toggleSettings(true)"><span>⚙️</span> Settings</button>
+    <button class="btn-sidebar"><span>❓</span> Support</button>
+    <p style="font-size: 0.7rem; color: #444; margin-top: 10px; text-align: center;">v2.0.4 Premium</p>
+  </div>
+</div>
+
+<div class="main">
+  <div class="menu-toggle" id="menuToggle" onclick="toggleSidebar()">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path class="brain-svg" d="M12 21.5c.3 0 .5-.2.5-.5v-7.5c1.4-.2 2.5-1.4 2.5-2.9 0-1.6-1.3-2.9-2.9-2.9h-.1V4c0-1.1-.9-2-2-2S8 2.9 8 4v3.7h-.1C6.3 7.7 5 9 5 10.6c0 1.5 1.1 2.7 2.5 2.9V21c0 .3.2.5.5.5h4z" />
+      <path class="brain-svg" opacity="0.4" d="M17.5 11c0-2.5-2-4.5-4.5-4.5V5c3.3 0 6 2.7 6 6s-2.7 6-6 6v-1.5c2.5 0 4.5-2 4.5-4.5zM6.5 11c0-2.5 2-4.5 4.5-4.5V5c-3.3 0-6 2.7-6 6s2.7 6 6 6v-1.5c-2.5 0-4.5-2-4.5-4.5z" />
+    </svg>
+  </div>
+
+  <div id="welcome-bg">
+    <h1>BOSS AI</h1>
+    <p style="color:var(--secondary-glow); font-weight: 500; letter-spacing: 2px;">SECURE NEURAL INTERFACE</p>
+  </div>
+
+  <div class="chat-box" id="chatBox">
+    <div class="message-container" id="messageContainer"></div>
+  </div>
+
+  <div class="bottom-wrapper">
+    <div class="input-container">
+      <label class="icon-btn-left" title="Upload Data">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+        <input type="file" id="fileInput" hidden>
+      </label>
+
+      <input id="userInput" placeholder="Type a command..." autocomplete="off">
+      
+      <div id="micBtn" class="icon-btn-right" onclick="toggleVoice()" title="Voice Command">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+          <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+        </svg>
+      </div>
+
+      <button class="send-btn" onclick="sendMessage()">
+        <svg viewBox="0 0 24 24" style="width:18px; height:18px; fill:#000;"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+      </button>
+    </div>
+    <div class="footer-credit">Developed by Bhupendra Saini</div>
+  </div>
 </div>
 
 <div class="modal" id="loginPage">
@@ -207,47 +325,16 @@
     <input id="username" placeholder="Operator Name" style="width:100%; margin-bottom:12px; padding:14px; border-radius:12px; border:1px solid #333; background:#000; color:#fff; outline:none;">
     <input id="password" type="password" placeholder="Access Code" style="width:100%; margin-bottom:25px; padding:14px; border-radius:12px; border:1px solid #333; background:#000; color:#fff; outline:none;">
     <button class="btn-sidebar" style="background:var(--primary-glow); color:#000; width:100%; font-weight:800; justify-content:center; height: 50px;" onclick="login()">INITIALIZE SYSTEM</button>
-    <p style="font-size: 0.7rem; color: #444; margin-top: 15px;">Hint: Admin user is 'admin'</p>
   </div>
 </div>
 
-<div class="sidebar" id="sidebar">
-  <div class="sidebar-top">
-    <h2 style="color: var(--primary-glow); margin-bottom:30px; font-weight: 800; letter-spacing: -1px;">BOSS AI <span id="adminTag" class="hidden admin-badge">ADMIN</span></h2>
-    <button class="btn-sidebar" onclick="newChat()"><span>+</span> New Session</button>
-    <button class="btn-sidebar" onclick="generateLetterTemplate()"><span>📝</span> Application Formats</button>
-    <button class="btn-sidebar"><span>🔍</span> History</button>
-    <div id="adminPanel" class="hidden" style="margin-top: 20px; border-top: 1px solid var(--glass-border); padding-top: 15px;">
-        <p style="color: var(--admin-color); font-size: 0.7rem; font-weight: bold; margin-bottom: 10px;">ADMIN CONSOLE</p>
-        <button class="btn-sidebar" style="border-color: var(--admin-color);"><span>📊</span> User Logs</button>
-        <button class="btn-sidebar" style="border-color: var(--admin-color);"><span>🔑</span> API Status</button>
-    </div>
-  </div>
-  <div class="sidebar-bottom">
-    <button class="btn-sidebar" onclick="logout()"><span>🚪</span> Logout</button>
-    <button class="btn-sidebar" onclick="toggleSettings(true)"><span>⚙️</span> Settings</button>
-    <p style="font-size: 0.7rem; color: #444; margin-top: 10px; text-align: center;">v2.1.0 Premium</p>
-  </div>
-</div>
-
-<div class="main">
-  <div id="welcome-bg">
-    <h1>BOSS AI</h1>
-    <p id="operatorDisplay" style="color:var(--secondary-glow); font-weight: 500; letter-spacing: 2px;">SECURE NEURAL INTERFACE</p>
-  </div>
-
-  <div class="chat-box" id="chatBox">
-    <div class="message-container" id="messageContainer"></div>
-  </div>
-
-  <div class="bottom-wrapper">
-    <div class="input-container">
-      <input id="userInput" placeholder="Ask to write a letter or application..." autocomplete="off">
-      <button class="send-btn" onclick="sendMessage()">
-        <svg viewBox="0 0 24 24" style="width:18px; height:18px; fill:#000;"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
-      </button>
-    </div>
-    <div class="footer-credit">Developed by Bhupendra Saini</div>
+<div id="settingsPanel" class="modal hidden">
+  <div class="modal-content">
+    <h3 style="color:#fff; margin-bottom:10px;">Configuration</h3>
+    <p style="color: #64748b; font-size: 0.8rem; margin-bottom: 20px;">Enter your OpenRouter API Key</p>
+    <input id="apiInput" type="password" placeholder="sk-or-v1-..." style="width:100%; margin-bottom:15px; padding:14px; border-radius:12px; background:#000; color:#fff; border:1px solid #333; outline:none;">
+    <button class="btn-sidebar" style="background:var(--accent); color:#000; width:100%; justify-content:center; font-weight:bold;" onclick="saveAPI()">SAVE CONFIGURATION</button>
+    <button class="btn-sidebar" style="color:#64748b; width:100%; border:none; background:transparent; justify-content:center;" onclick="toggleSettings(false)">Cancel</button>
   </div>
 </div>
 
@@ -261,61 +348,65 @@
   const userInput = document.getElementById('userInput');
   const welcomeBg = document.getElementById('welcome-bg');
 
-  const SYSTEM_PROMPT = `You are BOSS AI. 
-  When asked for letters or applications:
-  1. Use a strictly professional and formal format.
-  2. Include placeholders like [Your Name], [Date], [Recipient Name].
-  3. Ensure the tone is polite and grammatically perfect.
-  4. Format with clear spacing.`;
+  const SYSTEM_PROMPT = `You are BOSS AI, an elite assistant. 1. Helpful 2. Emojis 3. High-tech vibe.`;
 
-  // LOGIN LOGIC
   function login() {
-    const user = document.getElementById('username').value.trim();
     const pass = document.getElementById('password').value;
-    
+    const user = document.getElementById('username').value;
     if(pass === "bhupi2026") {
       currentUser = user || "Operator";
       localStorage.setItem("user", currentUser);
-      
-      if(user.toLowerCase() === 'admin') {
-        localStorage.setItem("role", "admin");
-        showAdminFeatures();
-      }
-      
       document.getElementById('loginPage').classList.add('hidden');
-      document.getElementById('operatorDisplay').textContent = `WELCOME, ${currentUser.toUpperCase()}`;
       userInput.focus();
     } else {
-      alert("Access Denied: Invalid Access Code");
+      alert("Access Denied");
     }
   }
 
-  function showAdminFeatures() {
-    document.getElementById('adminPanel').classList.remove('hidden');
-    document.getElementById('adminTag').classList.remove('hidden');
+  const micBtn = document.getElementById('micBtn');
+  let isListening = false;
+  const recognition = (window.SpeechRecognition || window.webkitSpeechRecognition) ? new (window.SpeechRecognition || window.webkitSpeechRecognition)() : null;
+
+  if (recognition) {
+    recognition.onstart = () => { isListening = true; micBtn.classList.add('listening'); };
+    recognition.onresult = (e) => { userInput.value = e.results[0][0].transcript; };
+    recognition.onend = () => { isListening = false; micBtn.classList.remove('listening'); };
   }
 
-  function logout() {
-    localStorage.clear();
-    location.reload();
+  function toggleVoice() {
+    if(!recognition) return alert("Speech recognition not supported.");
+    isListening ? recognition.stop() : recognition.start();
   }
 
-  function generateLetterTemplate() {
-    userInput.value = "Write a professional formal leave application for office.";
-    sendMessage();
+  function toggleSidebar() { 
+    document.getElementById('sidebar').classList.toggle('active'); 
+  }
+  
+  function toggleSettings(show) { document.getElementById('settingsPanel').classList.toggle('hidden', !show); }
+  
+  function saveAPI() { 
+    const v = document.getElementById('apiInput').value; 
+    if(v){ API_KEY=v; localStorage.setItem("api_key", v); toggleSettings(false); } 
+  }
+
+  function newChat() {
+    messageContainer.innerHTML = '';
+    chatHistory = [];
+    welcomeBg.style.opacity = '1';
+    if(window.innerWidth < 1024) toggleSidebar();
+    userInput.focus();
   }
 
   async function sendMessage() {
     const text = userInput.value.trim();
     if(!text) return;
-    if(!API_KEY) { alert("Please set API Key in Settings first!"); return; }
+    if(!API_KEY) { toggleSettings(true); return; }
 
     welcomeBg.style.opacity = '0';
     addMessage(text, 'user');
     chatHistory.push({role: "user", content: text});
     userInput.value = '';
-    
-    const botDiv = addMessage("Drafting professional response...", 'bot');
+    const botDiv = addMessage("Thinking...", 'bot');
     
     try {
       const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -326,12 +417,12 @@
           messages: [{role: "system", content: SYSTEM_PROMPT}, ...chatHistory]
         })
       });
-      
       const data = await res.json();
-      const response = data.choices?.[0]?.message?.content || "Error in processing.";
+      const response = data.choices?.[0]?.message?.content || "Error fetching response.";
       chatHistory.push({role: "assistant", content: response});
       botDiv.textContent = response;
-    } catch(e) { botDiv.textContent = "System Offline."; }
+      chatBox.scrollTo(0, chatBox.scrollHeight);
+    } catch(e) { botDiv.textContent = "Error."; }
   }
 
   function addMessage(text, sender) {
@@ -339,17 +430,13 @@
     div.className = `message ${sender}`;
     div.textContent = text;
     messageContainer.appendChild(div);
-    chatBox.scrollTo(0, chatBox.scrollHeight);
+    chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
     return div;
   }
 
-  window.onload = () => {
-    if(currentUser) {
-        document.getElementById('loginPage').classList.add('hidden');
-        document.getElementById('operatorDisplay').textContent = `WELCOME, ${currentUser.toUpperCase()}`;
-        if(localStorage.getItem("role") === "admin") showAdminFeatures();
-    }
-  };
+  userInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendMessage(); });
+  window.onload = () => { if(currentUser) document.getElementById('loginPage').classList.add('hidden'); };
 </script>
+
 </body>
 </html>
