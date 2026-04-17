@@ -16,7 +16,6 @@
       --glass-border: rgba(255, 255, 255, 0.1);
       --user-msg: #2563eb;
       --bot-msg: rgba(255, 255, 255, 0.08);
-      --error-red: #ff4b2b;
     }
 
     * { margin:0; padding:0; box-sizing:border-box; font-family: 'Inter', sans-serif; }
@@ -209,8 +208,6 @@
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
-    
-    #login-error { color: var(--error-red); font-size: 0.8rem; margin-top: 10px; display: none; }
   </style>
 </head>
 <body>
@@ -226,9 +223,8 @@
     <h1 style="margin-bottom: 10px; color: var(--primary-glow); letter-spacing: -1px;">BOSS AI</h1>
     <p style="color: #64748b; margin-bottom: 25px; font-size: 0.9rem;">Authentication Required</p>
     <input id="username" placeholder="Operator Name" style="width:100%; margin-bottom:12px; padding:14px; border-radius:12px; border:1px solid #333; background:#000; color:#fff; outline:none;">
-    <input id="password" type="password" placeholder="Access Code" style="width:100%; margin-bottom:15px; padding:14px; border-radius:12px; border:1px solid #333; background:#000; color:#fff; outline:none;">
-    <div id="login-error">⚠️ Invalid Access Credentials</div>
-    <button id="loginBtn" class="btn-sidebar" style="background:var(--primary-glow); color:#000; width:100%; font-weight:800; justify-content:center; height: 50px; margin-top: 10px;" onclick="login()">INITIALIZE SYSTEM</button>
+    <input id="password" type="password" placeholder="Access Code" style="width:100%; margin-bottom:25px; padding:14px; border-radius:12px; border:1px solid #333; background:#000; color:#fff; outline:none;">
+    <button class="btn-sidebar" style="background:var(--primary-glow); color:#000; width:100%; font-weight:800; justify-content:center; height: 50px;" onclick="login()">INITIALIZE SYSTEM</button>
   </div>
 </div>
 
@@ -243,14 +239,14 @@
   </div>
   <div class="sidebar-bottom">
     <button class="btn-sidebar" onclick="toggleSettings(true)"><span>⚙️</span> Settings</button>
-    <button class="btn-sidebar" onclick="logout()"><span>🚪</span> Logout</button>
+    <button class="btn-sidebar"><span>❓</span> Support</button>
     <p style="font-size: 0.7rem; color: #444; margin-top: 10px; text-align: center;">v2.0.4 Premium</p>
   </div>
 </div>
 
 <div class="main">
   <div id="welcome-bg">
-    <h1 id="welcome-title">BOSS AI</h1>
+    <h1>BOSS AI</h1>
     <p style="color:var(--secondary-glow); font-weight: 500; letter-spacing: 2px;">SECURE NEURAL INTERFACE</p>
   </div>
 
@@ -294,57 +290,36 @@
 
 <script>
   let API_KEY = localStorage.getItem("api_key") || "";
-  let currentUser = localStorage.getItem("boss_user") || null;
+  let currentUser = localStorage.getItem("user") || null;
+  
+  // FIXED: Memory Storage
   let chatHistory = []; 
 
   const chatBox = document.getElementById('chatBox');
   const messageContainer = document.getElementById('messageContainer');
   const userInput = document.getElementById('userInput');
   const welcomeBg = document.getElementById('welcome-bg');
-  const loginError = document.getElementById('login-error');
 
   const SYSTEM_PROMPT = `You are BOSS AI, an elite, intelligent, and reliable assistant. 
   1. Provide clear, accurate, and helpful answers. 
-  2. ALWAYS use relevant emojis.
+  2. ALWAYS use relevant emojis in your replies to make them engaging and expressive. 🤖✨
   3. Adapt tone to the user but maintain a high-tech "Elite Interface" vibe. 🚀
-  4. Use structured formatting (bullets/bold) for clarity.`;
+  4. Break down complexity simply. 
+  5. Use structured formatting (bullets/bold) for clarity. 📊
+  6. Present reasoning only if asked.`;
 
-  // --- FUNCTIONAL LOGIN LAYER ---
   function login() {
     const pass = document.getElementById('password').value;
-    const user = document.getElementById('username').value.trim();
-    const btn = document.getElementById('loginBtn');
-
-    loginError.style.display = "none";
-    
+    const user = document.getElementById('username').value;
     if(pass === "bhupi2026") {
-      btn.textContent = "VERIFYING...";
-      setTimeout(() => {
-        currentUser = user || "Operator";
-        localStorage.setItem("boss_user", currentUser);
-        localStorage.setItem("is_auth", "true");
-        
-        document.getElementById('loginPage').classList.add('hidden');
-        document.getElementById('welcome-title').textContent = `WELCOME, ${currentUser.toUpperCase()}`;
-        userInput.focus();
-        btn.textContent = "INITIALIZE SYSTEM";
-      }, 800);
+      currentUser = user || "Operator";
+      localStorage.setItem("user", currentUser);
+      document.getElementById('loginPage').classList.add('hidden');
+      userInput.focus();
     } else {
-      loginError.style.display = "block";
-      document.getElementById('password').value = "";
+      alert("Access Denied");
     }
   }
-
-  function logout() {
-    localStorage.removeItem("boss_user");
-    localStorage.removeItem("is_auth");
-    location.reload();
-  }
-
-  // Handle Login on Enter Key
-  document.getElementById('password').addEventListener('keypress', (e) => {
-    if(e.key === 'Enter') login();
-  });
 
   // Voice Logic
   const micBtn = document.getElementById('micBtn');
@@ -364,7 +339,6 @@
 
   function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
   function toggleSettings(show) { document.getElementById('settingsPanel').classList.toggle('hidden', !show); }
-  
   function saveAPI() { 
     const v = document.getElementById('apiInput').value; 
     if(v){ API_KEY=v; localStorage.setItem("api_key", v); toggleSettings(false); } 
@@ -372,7 +346,7 @@
 
   function newChat() {
     messageContainer.innerHTML = '';
-    chatHistory = [];
+    chatHistory = []; // Clear memory for new session
     welcomeBg.style.opacity = '1';
     if(window.innerWidth < 1024) toggleSidebar();
     userInput.focus();
@@ -385,10 +359,12 @@
 
     welcomeBg.style.opacity = '0';
     addMessage(text, 'user');
-    chatHistory.push({role: "user", content: text});
-    userInput.value = '';
     
-    const botDiv = addMessage("Generating response...", 'bot');
+    // Add to history
+    chatHistory.push({role: "user", content: text});
+    
+    userInput.value = '';
+    const botDiv = addMessage("Initializing Response...", 'bot');
     
     try {
       const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -399,15 +375,21 @@
         },
         body: JSON.stringify({ 
           model: "google/gemini-2.0-flash-001",
-          messages: [{role: "system", content: SYSTEM_PROMPT}, ...chatHistory],
+          messages: [
+            {role: "system", content: SYSTEM_PROMPT},
+            ...chatHistory // FIXED: Sends all previous messages
+          ],
           temperature: 0.6
         })
       });
       
       const data = await res.json();
       const response = data.choices?.[0]?.message?.content || "System encountered an error.";
+      
+      // Store AI response in history
       chatHistory.push({role: "assistant", content: response});
 
+      // Typing effect
       botDiv.textContent = "";
       let i = 0;
       const interval = setInterval(() => {
@@ -419,6 +401,7 @@
           clearInterval(interval);
         }
       }, 10);
+
     } catch(e) { 
       botDiv.textContent = "Connectivity failure. Verify credentials."; 
     }
@@ -434,18 +417,8 @@
   }
 
   userInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendMessage(); });
-  
-  // Persistent session check
-  window.onload = () => { 
-    if(localStorage.getItem("is_auth") === "true") {
-      document.getElementById('loginPage').classList.add('hidden');
-      document.getElementById('welcome-title').textContent = `WELCOME, ${currentUser.toUpperCase()}`;
-    }
-  };
-
-  document.getElementById('fileInput').onchange = function() { 
-    if(this.files.length) addMessage(`📎 File Linked: ${this.files[0].name}`, 'user'); 
-  };
+  window.onload = () => { if(currentUser) document.getElementById('loginPage').classList.add('hidden'); };
+  document.getElementById('fileInput').onchange = function() { if(this.files.length) addMessage(`📎 File Linked: ${this.files[0].name}`, 'user'); };
 </script>
 
 </body>
