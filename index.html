@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>BOSS AI</title>
+<title>BOSS AI - Gemma 4</title>
 
 <style>
 
@@ -28,14 +28,13 @@ height:100vh;
 display:flex;
 background:var(--bg);
 color:var(--text);
-font-family:Arial, sans-serif;
+font-family:Arial,sans-serif;
 }
 
 
-/* Sidebar */
+/* SIDEBAR */
 
 .sidebar{
-
 width:280px;
 background:#070b12;
 border-right:1px solid var(--border);
@@ -43,17 +42,14 @@ padding:20px;
 display:flex;
 flex-direction:column;
 gap:15px;
-
 }
 
 
 .logo{
-
 font-size:28px;
 font-weight:bold;
 color:var(--accent);
 text-align:center;
-
 }
 
 
@@ -80,7 +76,8 @@ font-weight:bold;
 }
 
 
-/* Main */
+
+/* MAIN */
 
 .main{
 
@@ -115,14 +112,12 @@ white-space:pre-wrap;
 }
 
 
-
 .user{
 
 align-self:flex-end;
 background:var(--user);
 
 }
-
 
 
 .bot{
@@ -132,7 +127,6 @@ background:var(--card);
 border:1px solid var(--border);
 
 }
-
 
 
 pre{
@@ -160,7 +154,7 @@ cursor:pointer;
 
 
 
-/* Input */
+/* INPUT */
 
 .input-area{
 
@@ -218,10 +212,12 @@ max-width:95%;
 
 </head>
 
+
 <body>
 
 
 <div class="sidebar">
+
 
 <div class="logo">
 ⚡ BOSS AI
@@ -233,27 +229,34 @@ type="password"
 placeholder="OpenRouter API Key">
 
 
+
 <select id="model">
 
-<option value="google/gemini-flash-1.5-8b">
-Gemini Flash
+
+<option value="google/gemma-4-26B-A4B-it">
+Gemma 4 26B A4B
 </option>
+
 
 <option value="openai/gpt-4o-mini">
 GPT-4o Mini
 </option>
 
+
 </select>
 
 
+
 <button onclick="saveSettings()">
-Save Key
+Save Settings
 </button>
+
 
 
 <button onclick="newChat()">
 New Chat
 </button>
+
 
 
 <button onclick="clearMemory()">
@@ -262,6 +265,8 @@ Clear Memory
 
 
 </div>
+
+
 
 
 
@@ -274,100 +279,120 @@ Clear Memory
 
 <div class="input-area">
 
-<textarea id="input"
+
+<textarea 
+id="input"
 placeholder="Message BOSS AI..."></textarea>
+
 
 
 <button class="send"
 onclick="sendMessage()">
+
 SEND
+
 </button>
 
+
 </div>
 
 
 </div>
+
+
+
 
 
 <script>
-// ===============================
-// BOSS AI CORE ENGINE
-// ===============================
 
 
-let messages = JSON.parse(
-    localStorage.getItem("boss_memory") || "[]"
+// ============================
+// BOSS AI ENGINE
+// ============================
+
+
+let messages =
+JSON.parse(
+localStorage.getItem("boss_memory") || "[]"
 );
 
 
-// Load saved API key and model
+
+// Load settings
+
 
 document.getElementById("apiKey").value =
 localStorage.getItem("boss_key") || "";
 
 
+
 document.getElementById("model").value =
 localStorage.getItem("boss_model") ||
-"google/gemini-flash-1.5-8b";
+"google/gemma-4-26B-A4B-it";
 
 
 
 
 // Save settings
 
+
 function saveSettings(){
 
-    let key =
-    document.getElementById("apiKey").value.trim();
+let key =
+document.getElementById("apiKey")
+.value.trim();
 
 
-    let model =
-    document.getElementById("model").value;
+let model =
+document.getElementById("model")
+.value;
 
 
-    localStorage.setItem(
-        "boss_key",
-        key
-    );
+localStorage.setItem(
+"boss_key",
+key
+);
 
 
-    localStorage.setItem(
-        "boss_model",
-        model
-    );
+localStorage.setItem(
+"boss_model",
+model
+);
 
 
-    alert("Settings saved");
+alert("Saved");
 
 }
 
 
 
 
-// Render old messages
+// Load chat
+
 
 function loadChat(){
 
-    let box =
-    document.getElementById("chat");
+let box =
+document.getElementById("chat");
 
 
-    box.innerHTML="";
+box.innerHTML="";
 
 
-    messages.forEach(m=>{
+messages.forEach(m=>{
 
-        addMessage(
-            m.role==="user" ? "user":"bot",
-            m.content,
-            false
-        );
-
-    });
+addMessage(
+m.role==="user" ? "user":"bot",
+m.content,
+false
+);
 
 
-    box.scrollTop =
-    box.scrollHeight;
+});
+
+
+box.scrollTop =
+box.scrollHeight;
 
 }
 
@@ -378,108 +403,107 @@ loadChat();
 
 
 
+
 // Add message
 
-function addMessage(
-type,
-text,
-save=true
-){
+
+function addMessage(type,text,save=true){
 
 
-    let box =
-    document.getElementById("chat");
+let box =
+document.getElementById("chat");
 
 
-    let div =
-    document.createElement("div");
+let div =
+document.createElement("div");
 
 
-    div.className =
-    "message "+type;
+div.className =
+"message "+type;
 
 
-
-    div.innerHTML =
-    formatText(text);
+div.innerHTML =
+formatText(text);
 
 
 
-    if(type==="bot"){
+if(type==="bot"){
 
 
-        let btn =
-        document.createElement("button");
+let copy =
+document.createElement("button");
 
 
-        btn.className="copy";
+copy.className="copy";
 
-        btn.innerText="COPY";
-
-
-        btn.onclick=function(){
-
-            navigator.clipboard.writeText(text);
-
-            btn.innerText="COPIED";
+copy.innerText="COPY";
 
 
-            setTimeout(()=>{
+copy.onclick=()=>{
 
-                btn.innerText="COPY";
+navigator.clipboard.writeText(text);
 
-            },1500);
-
-        };
+copy.innerText="COPIED";
 
 
-        div.appendChild(btn);
+setTimeout(()=>{
 
-    }
+copy.innerText="COPY";
 
-
-
-    box.appendChild(div);
+},1500);
 
 
+};
 
-    if(save){
+
+div.appendChild(copy);
 
 
-        messages.push({
-
-            role:
-            type==="user"
-            ?"user"
-            :"assistant",
-
-            content:text
-
-        });
+}
 
 
 
-        // Keep last 20 messages
-
-        if(messages.length>20){
-
-            messages =
-            messages.slice(-20);
-
-        }
-
-
-        localStorage.setItem(
-            "boss_memory",
-            JSON.stringify(messages)
-        );
-
-    }
+box.appendChild(div);
 
 
 
-    box.scrollTop =
-    box.scrollHeight;
+if(save){
+
+
+messages.push({
+
+role:type==="user"
+?"user"
+:"assistant",
+
+content:text
+
+});
+
+
+
+if(messages.length>20){
+
+messages =
+messages.slice(-20);
+
+}
+
+
+
+localStorage.setItem(
+"boss_memory",
+JSON.stringify(messages)
+);
+
+
+}
+
+
+
+box.scrollTop =
+box.scrollHeight;
+
 
 }
 
@@ -487,83 +511,80 @@ save=true
 
 
 
-// Simple markdown
+
 
 function formatText(text){
 
 
-    text =
-    text.replace(
-        /</g,
-        "&lt;"
-    )
-    .replace(
-        />/g,
-        "&gt;"
-    );
+text=text
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;");
 
 
-    text =
-    text.replace(
-        /```([\s\S]*?)```/g,
-        "<pre>$1</pre>"
-    );
+text=text.replace(
+/```([\s\S]*?)```/g,
+"<pre>$1</pre>"
+);
 
 
-    text =
-    text.replace(
-        /\*\*(.*?)\*\*/g,
-        "<b>$1</b>"
-    );
+text=text.replace(
+/\*\*(.*?)\*\*/g,
+"<b>$1</b>"
+);
 
 
-    text =
-    text.replace(
-        /\n/g,
-        "<br>"
-    );
+text=text.replace(
+/\n/g,
+"<br>"
+);
 
 
-    return text;
+return text;
 
 }
 
 
 
 
-// Clear all memory
+
+
 
 function clearMemory(){
 
-    if(confirm("Delete all chats?")){
+if(confirm("Delete all chats?")){
 
-        messages=[];
 
-        localStorage.removeItem(
-            "boss_memory"
-        );
+messages=[];
 
-        loadChat();
 
-    }
+localStorage.removeItem(
+"boss_memory"
+);
+
+
+loadChat();
+
+
+}
 
 }
 
 
 
 
-// New chat
+
 
 function newChat(){
 
-    messages=[];
-
-    localStorage.removeItem(
-        "boss_memory"
-    );
+messages=[];
 
 
-    loadChat();
+localStorage.removeItem(
+"boss_memory"
+);
+
+
+loadChat();
 
 }
 
@@ -571,176 +592,172 @@ function newChat(){
 
 
 
-// Send message
+
 
 async function sendMessage(){
 
 
-    let input =
-    document.getElementById("input");
 
+let input =
+document.getElementById("input");
 
-    let text =
-    input.value.trim();
 
+let text =
+input.value.trim();
 
-    let key =
-    document.getElementById("apiKey")
-    .value.trim();
 
 
+let key =
+document.getElementById("apiKey")
+.value.trim();
 
-    if(!text){
 
-        return;
 
-    }
 
+if(!text)
+return;
 
 
-    if(!key){
 
-        alert(
-        "Please enter OpenRouter API key"
-        );
+if(!key){
 
-        return;
+alert("Enter OpenRouter API Key");
 
-    }
+return;
 
+}
 
 
-    addMessage(
-        "user",
-        text
-    );
 
 
-    input.value="";
+addMessage(
+"user",
+text
+);
 
 
 
+input.value="";
 
-    let loading =
-    document.createElement("div");
 
 
-    loading.className =
-    "message bot";
+let loading =
+document.createElement("div");
 
 
-    loading.id="loading";
+loading.id="loading";
 
+loading.className="message bot";
 
-    loading.innerHTML =
-    "🤖 Thinking...";
+loading.innerHTML="🤖 Thinking...";
 
 
-    document
-    .getElementById("chat")
-    .appendChild(loading);
+document
+.getElementById("chat")
+.appendChild(loading);
 
 
 
 
 
-    try{
+try{
 
 
-        let response =
-        await fetch(
-        "https://openrouter.ai/api/v1/chat/completions",
-        {
+let response =
+await fetch(
+"https://openrouter.ai/api/v1/chat/completions",
+{
 
-            method:"POST",
+method:"POST",
 
+headers:{
 
-            headers:{
+"Authorization":
+"Bearer "+key,
 
-                "Authorization":
-                "Bearer "+key,
+"Content-Type":
+"application/json"
 
+},
 
-                "Content-Type":
-                "application/json"
 
-            },
+body:JSON.stringify({
 
+model:
+document
+.getElementById("model")
+.value,
 
-            body:JSON.stringify({
 
-                model:
-                document
-                .getElementById("model")
-                .value,
+messages:messages,
 
 
-                messages:messages
+temperature:0.7
 
 
-            })
+})
 
 
-        });
+});
 
 
 
-        let data =
-        await response.json();
 
+let data =
+await response.json();
 
 
-        document
-        .getElementById("loading")
-        ?.remove();
 
 
+document
+.getElementById("loading")
+?.remove();
 
 
-        if(data.error){
 
-            throw new Error(
-                data.error.message
-            );
 
-        }
+if(data.error){
 
+throw new Error(
+data.error.message
+);
 
+}
 
 
-        let reply =
-        data.choices[0]
-        .message
-        .content;
 
+let reply =
+data.choices[0]
+.message
+.content;
 
 
 
-        addMessage(
-            "bot",
-            reply
-        );
+addMessage(
+"bot",
+reply
+);
 
 
 
-    }
+}
 
-    catch(err){
+catch(err){
 
 
-        document
-        .getElementById("loading")
-        ?.remove();
+document
+.getElementById("loading")
+?.remove();
 
 
 
-        addMessage(
-            "bot",
-            "❌ "+err.message
-        );
+addMessage(
+"bot",
+"❌ "+err.message
+);
 
 
-    }
+}
 
 
 }
@@ -748,13 +765,13 @@ async function sendMessage(){
 
 
 
-// Enter to send
+
 
 document
 .getElementById("input")
 .addEventListener(
 "keydown",
-function(e){
+e=>{
 
 if(e.key==="Enter" && !e.shiftKey){
 
@@ -765,7 +782,11 @@ sendMessage();
 }
 
 });
+
+
+
 </script>
+
 
 </body>
 </html>
