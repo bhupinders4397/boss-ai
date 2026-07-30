@@ -1,225 +1,230 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
 <title>BOSS AI - Gemma 4</title>
+
 
 <style>
 
 :root{
-    --bg:#050816;
-    --panel:#0f172a;
-    --card:#172033;
-    --border:#263248;
-    --text:#f1f5f9;
-    --muted:#94a3b8;
-    --accent:#00f2fe;
-    --accent2:#4facfe;
-    --user:#2563eb;
-    --danger:#ef4444;
+
+--bg:#050816;
+--panel:#0f172a;
+--card:#172033;
+--border:#263248;
+--text:#f8fafc;
+--accent:#00f2fe;
+--accent2:#4facfe;
+--user:#2563eb;
+
 }
 
 
 *{
-    box-sizing:border-box;
-    -webkit-tap-highlight-color:transparent;
+
+box-sizing:border-box;
+-webkit-tap-highlight-color:transparent;
+
 }
 
 
-body{
+html,body{
 
-    margin:0;
-    height:100vh;
-    overflow:hidden;
+margin:0;
+width:100%;
+height:100%;
+overflow:hidden;
 
-    background:
-    radial-gradient(circle at top,#12203f,#050816 45%);
+font-family:
+Inter,
+system-ui,
+Arial,
+sans-serif;
 
-    color:var(--text);
-    font-family:
-    Inter,
-    system-ui,
-    -apple-system,
-    Arial,
-    sans-serif;
+background:var(--bg);
+color:white;
+
 }
 
 
-
-/* APP */
 
 .app{
 
-    height:100vh;
-    display:flex;
+width:100%;
+height:100dvh;
+display:flex;
 
 }
+
 
 
 
 /* SIDEBAR */
 
+
 .sidebar{
 
-    width:280px;
+width:280px;
 
-    background:
-    rgba(15,23,42,.85);
+height:100%;
 
-    backdrop-filter:blur(15px);
+background:
+rgba(15,23,42,.95);
 
-    border-right:
-    1px solid var(--border);
+border-right:
+1px solid var(--border);
 
-    padding:20px;
+padding:20px;
 
-    display:flex;
-    flex-direction:column;
+display:flex;
 
-    gap:15px;
+flex-direction:column;
+
+gap:15px;
+
+z-index:100;
 
 }
+
 
 
 .logo{
 
-    text-align:center;
+font-size:30px;
 
-    font-size:28px;
-    font-weight:900;
+font-weight:900;
 
-    color:var(--accent);
+text-align:center;
 
-    text-shadow:
-    0 0 20px var(--accent);
+color:var(--accent);
 
-}
+text-shadow:
+0 0 20px var(--accent);
 
-
-
-input,
-select,
-button,
-textarea{
-
-    font-family:inherit;
+margin-bottom:10px;
 
 }
+
 
 
 
 .sidebar input,
 .sidebar select{
 
-    width:100%;
+width:100%;
 
-    padding:13px;
+padding:13px;
 
-    border-radius:12px;
+border-radius:12px;
 
-    background:#111827;
+background:#111827;
 
-    border:1px solid var(--border);
+border:1px solid var(--border);
 
-    color:white;
+color:white;
 
-    outline:none;
+outline:none;
 
 }
+
 
 
 
 .sidebar button{
 
-    padding:13px;
+padding:13px;
 
-    border:none;
+border:0;
 
-    border-radius:12px;
+border-radius:12px;
 
-    cursor:pointer;
+font-weight:bold;
 
-    font-weight:700;
+cursor:pointer;
 
-    background:
-    linear-gradient(
-    135deg,
-    var(--accent),
-    var(--accent2)
-    );
+background:
+linear-gradient(
+135deg,
+var(--accent),
+var(--accent2)
+);
 
-    color:#001018;
-
-}
-
-
-
-.sidebar button:active{
-
-    transform:scale(.96);
+color:#001018;
 
 }
 
 
 
 
+/* MAIN */
 
-/* MAIN CHAT */
 
 .main{
 
-    flex:1;
+flex:1;
 
-    display:flex;
+height:100%;
 
-    flex-direction:column;
+display:flex;
+
+flex-direction:column;
+
+min-width:0;
 
 }
+
 
 
 
 .chat{
 
-    flex:1;
+flex:1;
 
-    overflow-y:auto;
+overflow-y:auto;
 
-    padding:18px;
+padding:18px;
 
-    display:flex;
+display:flex;
 
-    flex-direction:column;
+flex-direction:column;
 
-    gap:14px;
+gap:14px;
 
-    scroll-behavior:smooth;
+scroll-behavior:smooth;
+
+padding-bottom:90px;
 
 }
+
+
 
 
 
 .message{
 
-    max-width:85%;
+max-width:85%;
 
-    padding:14px 16px;
+padding:14px 16px;
 
-    border-radius:18px;
+border-radius:18px;
 
-    line-height:1.5;
+line-height:1.5;
 
-    animation:
-    slide .25s ease;
+word-wrap:break-word;
 
-    word-wrap:break-word;
+animation:
+show .25s ease;
 
 }
 
 
 
-@keyframes slide{
+@keyframes show{
 
 from{
 
@@ -239,96 +244,90 @@ transform:none;
 
 
 
+
 .user{
 
-    align-self:flex-end;
+align-self:flex-end;
 
-    background:
-    linear-gradient(
-    135deg,
-    #2563eb,
-    #1d4ed8
-    );
+background:
+linear-gradient(
+135deg,
+#2563eb,
+#1d4ed8
+);
 
-    border-bottom-right-radius:5px;
+border-bottom-right-radius:5px;
 
 }
+
 
 
 
 .bot{
 
-    align-self:flex-start;
+align-self:flex-start;
 
-    background:
-    rgba(23,32,51,.9);
+background:var(--card);
 
-    border:
+border:1px solid var(--border);
 
-    1px solid var(--border);
-
-    border-bottom-left-radius:5px;
+border-bottom-left-radius:5px;
 
 }
+
 
 
 
 pre{
 
-    background:#020617;
+background:#020617;
 
-    padding:12px;
+padding:12px;
 
-    border-radius:12px;
+border-radius:10px;
 
-    overflow:auto;
-
-    font-size:13px;
+overflow:auto;
 
 }
+
 
 
 
 .copy{
 
-    margin-top:10px;
+margin-top:10px;
 
-    padding:7px 12px;
+padding:7px 12px;
 
-    border-radius:8px;
+border:0;
 
-    border:0;
+border-radius:8px;
 
-    background:#334155;
+background:#334155;
 
-    color:white;
-
-    cursor:pointer;
+color:white;
 
 }
 
 
 
 
-
-/* INPUT AREA */
+/* INPUT */
 
 
 .input-area{
 
-    padding:12px;
+height:75px;
 
-    display:flex;
+padding:10px;
 
-    gap:10px;
+display:flex;
 
-    background:
-    rgba(5,8,22,.9);
+gap:10px;
 
-    backdrop-filter:blur(15px);
+background:#050816;
 
-    border-top:
-    1px solid var(--border);
+border-top:1px solid var(--border);
 
 }
 
@@ -336,25 +335,23 @@ pre{
 
 textarea{
 
-    flex:1;
+flex:1;
 
-    height:55px;
+height:55px;
 
-    resize:none;
+resize:none;
 
-    padding:15px;
+padding:15px;
 
-    border-radius:16px;
+border-radius:15px;
 
-    background:#111827;
+background:#111827;
 
-    border:
+border:1px solid var(--border);
 
-    1px solid var(--border);
+color:white;
 
-    color:white;
-
-    outline:none;
+outline:none;
 
 }
 
@@ -362,25 +359,22 @@ textarea{
 
 .send{
 
-    width:90px;
+width:80px;
 
-    border:none;
+border:0;
 
-    border-radius:16px;
+border-radius:15px;
 
-    font-weight:800;
+font-weight:900;
 
-    background:
-    linear-gradient(
-    135deg,
-    var(--accent),
-    var(--accent2)
-    );
-
-    cursor:pointer;
+background:
+linear-gradient(
+135deg,
+var(--accent),
+var(--accent2)
+);
 
 }
-
 
 
 
@@ -388,36 +382,65 @@ textarea{
 /* MOBILE */
 
 
+.menu-btn{
+
+display:none;
+
+}
+
+
+
 @media(max-width:700px){
+
 
 
 .sidebar{
 
-    position:fixed;
+position:fixed;
 
-    left:-300px;
+left:-300px;
 
-    top:0;
+top:0;
 
-    height:100%;
+width:280px;
 
-    z-index:10;
+height:100dvh;
 
-    transition:.3s;
+transition:.3s;
 
 }
+
 
 
 .sidebar.active{
 
-    left:0;
+left:0;
 
 }
 
 
-.main{
 
-    width:100%;
+.menu-btn{
+
+display:block;
+
+position:fixed;
+
+top:12px;
+
+left:12px;
+
+z-index:200;
+
+background:var(--accent);
+
+border:0;
+
+border-radius:12px;
+
+padding:10px 14px;
+
+font-size:20px;
 
 }
 
@@ -425,7 +448,9 @@ textarea{
 
 .chat{
 
-    padding:12px;
+padding:12px;
+
+padding-top:60px;
 
 }
 
@@ -433,7 +458,9 @@ textarea{
 
 .message{
 
-    max-width:92%;
+max-width:95%;
+
+font-size:15px;
 
 }
 
@@ -441,8 +468,25 @@ textarea{
 
 .input-area{
 
-    padding:
-    10px;
+position:fixed;
+
+bottom:0;
+
+left:0;
+
+width:100%;
+
+height:70px;
+
+z-index:50;
+
+}
+
+
+
+textarea{
+
+height:50px;
 
 }
 
@@ -450,7 +494,7 @@ textarea{
 
 .send{
 
-    width:70px;
+width:65px;
 
 }
 
@@ -460,7 +504,6 @@ textarea{
 
 
 </style>
-
 </head>
 
 
@@ -469,48 +512,96 @@ textarea{
 
 <div class="app">
 
-  <!-- SIDEBAR -->
+
+
+<!-- MOBILE MENU BUTTON -->
+
+<button class="menu-btn" onclick="toggleSidebar()">
+☰
+</button>
+
+
+
+
+
+<!-- SIDEBAR -->
+
 
 <div class="sidebar" id="sidebar">
 
-    <div class="logo">
-        ⚡ BOSS AI
-    </div>
 
-
-    <input
-        id="apiKey"
-        type="password"
-        placeholder="OpenRouter API Key">
-
-
-    <select id="model">
-
-        <option value="google/gemma-4-26B-A4B-it">
-            Gemma 4 26B A4B
-        </option>
-
-        <option value="openai/gpt-4o-mini">
-            GPT-4o Mini
-        </option>
-
-    </select>
+<div class="logo">
+⚡ BOSS AI
+</div>
 
 
 
-    <button onclick="saveSettings()">
-        💾 Save Settings
-    </button>
+
+<input
+id="apiKey"
+type="password"
+placeholder="OpenRouter API Key">
 
 
-    <button onclick="newChat()">
-        🆕 New Chat
-    </button>
 
 
-    <button onclick="clearMemory()">
-        🗑 Clear Memory
-    </button>
+
+<select id="model">
+
+
+<option value="google/gemma-4-26B-A4B-it">
+
+Gemma 4 26B A4B
+
+</option>
+
+
+
+<option value="openai/gpt-4o-mini">
+
+GPT-4o Mini
+
+</option>
+
+
+
+</select>
+
+
+
+
+
+
+
+<button onclick="saveSettings()">
+
+💾 Save Settings
+
+</button>
+
+
+
+
+
+
+<button onclick="newChat()">
+
+🆕 New Chat
+
+</button>
+
+
+
+
+
+
+<button onclick="clearMemory()">
+
+🗑 Clear Memory
+
+</button>
+
+
 
 
 </div>
@@ -518,50 +609,89 @@ textarea{
 
 
 
-<!-- MAIN -->
+
+
+
+
+<!-- MAIN CHAT AREA -->
 
 
 <div class="main">
 
 
-    <div id="chat" class="chat"></div>
 
 
 
-    <div class="input-area">
+<div id="chat" class="chat">
 
-
-        <textarea
-        id="input"
-        placeholder="Message BOSS AI..."
-        ></textarea>
+</div>
 
 
 
-        <button
-        class="send"
-        onclick="sendMessage()">
-
-            ➤
-
-        </button>
 
 
-    </div>
+
+
+<div class="input-area">
+
+
+
+
+
+<textarea
+
+id="input"
+
+placeholder="Message BOSS AI..."
+
+></textarea>
+
+
+
+
+
+
+
+<button
+
+class="send"
+
+onclick="sendMessage()">
+
+➤
+
+</button>
+
+
+
+
 
 
 </div>
 
 
+
+
+
+
 </div>
+
+
+
+
+
+
+</div>
+
+
+
 
 
 
 <script>
-
-  // ===============================
+   // ================================
 // BOSS AI ENGINE
-// ===============================
+// ================================
 
 
 let messages =
@@ -571,14 +701,17 @@ localStorage.getItem("boss_memory") || "[]"
 
 
 
-const apiKeyInput =
+const apiKey =
 document.getElementById("apiKey");
 
-const modelSelect =
+
+const model =
 document.getElementById("model");
+
 
 const chat =
 document.getElementById("chat");
+
 
 const input =
 document.getElementById("input");
@@ -586,13 +719,15 @@ document.getElementById("input");
 
 
 
-// Load saved settings
 
-apiKeyInput.value =
+// Load settings
+
+
+apiKey.value =
 localStorage.getItem("boss_key") || "";
 
 
-modelSelect.value =
+model.value =
 localStorage.getItem("boss_model")
 ||
 "google/gemma-4-26B-A4B-it";
@@ -601,31 +736,30 @@ localStorage.getItem("boss_model")
 
 
 
+
+
 // Save settings
 
+
 function saveSettings(){
-
-let key =
-apiKeyInput.value.trim();
-
-
-let model =
-modelSelect.value;
 
 
 localStorage.setItem(
 "boss_key",
-key
+apiKey.value.trim()
 );
+
 
 
 localStorage.setItem(
 "boss_model",
-model
+model.value
 );
 
 
-alert("Settings saved ✅");
+
+alert("Settings Saved ✅");
+
 
 }
 
@@ -635,25 +769,28 @@ alert("Settings saved ✅");
 
 
 
-// Load previous chat
+
+// Load old chat
 
 
 function loadChat(){
 
+
 chat.innerHTML="";
 
 
-messages.forEach(item=>{
+messages.forEach(msg=>{
 
 
 addMessage(
-item.role==="user"
+
+msg.role==="user"
 ?
 "user"
 :
 "bot",
 
-item.content,
+msg.content,
 
 false
 
@@ -666,7 +803,9 @@ false
 chat.scrollTop =
 chat.scrollHeight;
 
+
 }
+
 
 
 loadChat();
@@ -678,14 +817,12 @@ loadChat();
 
 
 
-// Add message
+
+// Add chat bubble
 
 
-function addMessage(
-type,
-text,
-save=true
-){
+function addMessage(type,text,save=true){
+
 
 
 let div =
@@ -701,48 +838,54 @@ formatText(text);
 
 
 
+
+
+
 if(type==="bot"){
 
 
-let copy =
+
+let button =
 document.createElement("button");
 
 
-copy.className =
+button.className =
 "copy";
 
 
-copy.innerText =
+button.innerText =
 "📋 COPY";
 
 
 
-copy.onclick=function(){
+button.onclick=()=>{
 
 
 navigator.clipboard.writeText(text);
 
 
-copy.innerText =
-"✅ COPIED";
+button.innerText =
+"COPIED ✅";
 
 
 setTimeout(()=>{
 
-copy.innerText =
-"📋 COPY";
+button.innerText="📋 COPY";
 
 },1500);
+
 
 
 };
 
 
-
-div.appendChild(copy);
+div.appendChild(button);
 
 
 }
+
+
+
 
 
 
@@ -750,7 +893,10 @@ chat.appendChild(div);
 
 
 
+
+
 if(save){
+
 
 
 messages.push({
@@ -768,6 +914,8 @@ content:text
 
 
 
+
+
 if(messages.length>30){
 
 messages =
@@ -777,20 +925,28 @@ messages.slice(-30);
 
 
 
+
+
 localStorage.setItem(
+
 "boss_memory",
+
 JSON.stringify(messages)
 
 );
 
 
+
 }
+
+
 
 
 
 chat.scrollTop =
 chat.scrollHeight;
 
+
 }
 
 
@@ -799,10 +955,13 @@ chat.scrollHeight;
 
 
 
-// Text formatter
+
+
+// Format AI response
 
 
 function formatText(text){
+
 
 
 text =
@@ -814,6 +973,7 @@ text
 
 text =
 text.replace(
+
 /```([\s\S]*?)```/g,
 
 "<pre>$1</pre>"
@@ -824,6 +984,7 @@ text.replace(
 
 text =
 text.replace(
+
 /\*\*(.*?)\*\*/g,
 
 "<b>$1</b>"
@@ -834,6 +995,7 @@ text.replace(
 
 text =
 text.replace(
+
 /\n/g,
 
 "<br>"
@@ -841,7 +1003,9 @@ text.replace(
 );
 
 
+
 return text;
+
 
 }
 
@@ -852,13 +1016,16 @@ return text;
 
 
 
-// Clear memory
+
+
+// Clear chat memory
 
 
 function clearMemory(){
 
 
-if(confirm("Delete all chats?")){
+
+if(confirm("Delete all messages?")){
 
 
 messages=[];
@@ -874,6 +1041,7 @@ loadChat();
 
 }
 
+
 }
 
 
@@ -882,12 +1050,14 @@ loadChat();
 
 
 
-// New conversation
+
+// New chat
 
 
 function newChat(){
 
 
+
 messages=[];
 
 
@@ -909,18 +1079,43 @@ loadChat();
 
 
 
-// Send message
+// Sidebar toggle
+
+
+function toggleSidebar(){
+
+
+document
+.getElementById("sidebar")
+.classList.toggle("active");
+
+
+}
+
+
+
+
+
+
+
+
+
+// Send AI request
 
 
 async function sendMessage(){
+
 
 
 let text =
 input.value.trim();
 
 
+
 let key =
-apiKeyInput.value.trim();
+apiKey.value.trim();
+
+
 
 
 
@@ -929,10 +1124,11 @@ return;
 
 
 
+
 if(!key){
 
 alert(
-"Please enter OpenRouter API Key"
+"Enter OpenRouter API Key first"
 );
 
 return;
@@ -953,6 +1149,8 @@ input.value="";
 
 
 
+
+
 let loading =
 document.createElement("div");
 
@@ -969,12 +1167,10 @@ loading.innerHTML =
 "🤖 Thinking...";
 
 
+
 chat.appendChild(loading);
 
 
-
-chat.scrollTop =
-chat.scrollHeight;
 
 
 
@@ -992,7 +1188,9 @@ await fetch(
 
 method:"POST",
 
+
 headers:{
+
 
 "Authorization":
 "Bearer "+key,
@@ -1001,13 +1199,15 @@ headers:{
 "Content-Type":
 "application/json"
 
+
 },
+
 
 
 body:JSON.stringify({
 
-model:
-modelSelect.value,
+
+model:model.value,
 
 
 messages:messages,
@@ -1015,12 +1215,17 @@ messages:messages,
 
 temperature:0.7
 
+
 })
 
 
 }
 
+
 );
+
+
+
 
 
 
@@ -1039,6 +1244,9 @@ document
 
 
 
+
+
+
 if(data.error){
 
 throw new Error(
@@ -1046,6 +1254,8 @@ data.error.message
 );
 
 }
+
+
 
 
 
@@ -1059,10 +1269,15 @@ data
 
 
 
+
+
+
 addMessage(
 "bot",
 reply
 );
+
+
 
 
 
@@ -1082,28 +1297,28 @@ addMessage(
 
 "bot",
 
-"❌ Error: "
-+
-error.message
+"❌ "+error.message
 
 );
 
 
-}
-
-
 
 }
 
 
 
 
+}
 
 
 
 
 
-// Enter to send
+
+
+
+
+// Enter send
 
 
 input.addEventListener(
@@ -1134,19 +1349,11 @@ sendMessage();
 );
 
 
+</script>
 
 
-// Mobile sidebar swipe helper
-
-function toggleSidebar(){
-
-document
-.getElementById("sidebar")
-.classList.toggle("active");
-
-}
-
-  </script>
 
 </body>
+
 </html>
+    
