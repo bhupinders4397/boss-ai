@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 
 <meta charset="UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-<title>BOSS AI - Gemma 4</title>
+<title>Brain AI - Gemma 4</title>
 
 
 <style>
+
 
 :root{
 
@@ -33,11 +35,16 @@ box-sizing:border-box;
 }
 
 
-html,body{
+
+html,
+body{
 
 margin:0;
+
 width:100%;
+
 height:100%;
+
 overflow:hidden;
 
 font-family:
@@ -47,19 +54,26 @@ Arial,
 sans-serif;
 
 background:var(--bg);
+
 color:white;
 
 }
 
 
 
+
 .app{
 
 width:100%;
+
 height:100dvh;
+
 display:flex;
 
 }
+
+
+
 
 
 
@@ -74,7 +88,7 @@ width:280px;
 height:100%;
 
 background:
-rgba(15,23,42,.95);
+rgba(15,23,42,.96);
 
 border-right:
 1px solid var(--border);
@@ -93,6 +107,7 @@ z-index:100;
 
 
 
+
 .logo{
 
 font-size:30px;
@@ -106,15 +121,17 @@ color:var(--accent);
 text-shadow:
 0 0 20px var(--accent);
 
-margin-bottom:10px;
+margin-bottom:15px;
 
 }
 
 
 
 
+
 .sidebar input,
 .sidebar select{
+
 
 width:100%;
 
@@ -130,22 +147,26 @@ color:white;
 
 outline:none;
 
+
 }
+
 
 
 
 
 .sidebar button{
 
+
 padding:13px;
 
-border:0;
+border:none;
 
 border-radius:12px;
 
 font-weight:bold;
 
 cursor:pointer;
+
 
 background:
 linear-gradient(
@@ -154,9 +175,16 @@ var(--accent),
 var(--accent2)
 );
 
+
 color:#001018;
 
+
 }
+
+
+
+
+
 
 
 
@@ -165,6 +193,7 @@ color:#001018;
 
 
 .main{
+
 
 flex:1;
 
@@ -176,12 +205,17 @@ flex-direction:column;
 
 min-width:0;
 
+
 }
 
 
 
 
+
+
+
 .chat{
+
 
 flex:1;
 
@@ -199,13 +233,17 @@ scroll-behavior:smooth;
 
 padding-bottom:90px;
 
+
 }
 
 
 
 
 
+
+
 .message{
+
 
 max-width:85%;
 
@@ -220,34 +258,47 @@ word-wrap:break-word;
 animation:
 show .25s ease;
 
+
 }
+
+
 
 
 
 @keyframes show{
 
+
 from{
 
 opacity:0;
+
 transform:translateY(10px);
 
 }
 
+
 to{
 
 opacity:1;
+
 transform:none;
 
 }
 
+
 }
+
+
+
 
 
 
 
 .user{
 
+
 align-self:flex-end;
+
 
 background:
 linear-gradient(
@@ -256,16 +307,22 @@ linear-gradient(
 #1d4ed8
 );
 
+
 border-bottom-right-radius:5px;
+
 
 }
 
 
 
 
+
+
 .bot{
 
+
 align-self:flex-start;
+
 
 background:var(--card);
 
@@ -273,12 +330,15 @@ border:1px solid var(--border);
 
 border-bottom-left-radius:5px;
 
+
 }
 
 
 
 
+
 pre{
+
 
 background:#020617;
 
@@ -288,12 +348,15 @@ border-radius:10px;
 
 overflow:auto;
 
+
 }
 
 
 
 
+
 .copy{
+
 
 margin-top:10px;
 
@@ -307,15 +370,22 @@ background:#334155;
 
 color:white;
 
+cursor:pointer;
+
+
 }
 
 
 
 
-/* INPUT */
+
+
+
+/* INPUT AREA */
 
 
 .input-area{
+
 
 height:75px;
 
@@ -329,11 +399,15 @@ background:#050816;
 
 border-top:1px solid var(--border);
 
+
 }
 
 
 
+
+
 textarea{
+
 
 flex:1;
 
@@ -353,11 +427,15 @@ color:white;
 
 outline:none;
 
+
 }
 
 
 
+
+
 .send{
+
 
 width:80px;
 
@@ -374,19 +452,25 @@ var(--accent),
 var(--accent2)
 );
 
+
 }
 
 
 
 
-/* MOBILE */
+
 
 
 .menu-btn{
 
+
 display:none;
 
+
 }
+
+
+
 
 
 
@@ -395,6 +479,7 @@ display:none;
 
 
 .sidebar{
+
 
 position:fixed;
 
@@ -408,19 +493,26 @@ height:100dvh;
 
 transition:.3s;
 
+
 }
 
 
 
 .sidebar.active{
 
+
 left:0;
+
 
 }
 
 
 
+
+
+
 .menu-btn{
+
 
 display:block;
 
@@ -442,31 +534,41 @@ padding:10px 14px;
 
 font-size:20px;
 
+
 }
+
+
+
 
 
 
 .chat{
 
-padding:12px;
 
 padding-top:60px;
 
+
 }
+
 
 
 
 .message{
 
+
 max-width:95%;
 
 font-size:15px;
+
 
 }
 
 
 
+
+
 .input-area{
+
 
 position:fixed;
 
@@ -480,13 +582,16 @@ height:70px;
 
 z-index:50;
 
+
 }
 
 
 
 textarea{
 
+
 height:50px;
+
 
 }
 
@@ -494,19 +599,21 @@ height:50px;
 
 .send{
 
+
 width:65px;
 
-}
-
-
 
 }
+
+
+
+}
+
 
 
 </style>
+
 </head>
-
-
 <body>
 
 
@@ -514,11 +621,14 @@ width:65px;
 
 
 
-<!-- MOBILE MENU BUTTON -->
+<!-- MOBILE MENU -->
 
 <button class="menu-btn" onclick="toggleSidebar()">
+
 ☰
+
 </button>
+
 
 
 
@@ -530,17 +640,29 @@ width:65px;
 <div class="sidebar" id="sidebar">
 
 
+
 <div class="logo">
-⚡ BOSS AI
+
+🧠 Brain AI
+
 </div>
 
 
 
 
+
+
 <input
+
 id="apiKey"
+
 type="password"
-placeholder="OpenRouter API Key">
+
+placeholder="OpenRouter API Key"
+
+>
+
+
 
 
 
@@ -554,6 +676,8 @@ placeholder="OpenRouter API Key">
 Gemma 4 26B A4B
 
 </option>
+
+
 
 
 
@@ -573,11 +697,13 @@ GPT-4o Mini
 
 
 
+
 <button onclick="saveSettings()">
 
 💾 Save Settings
 
 </button>
+
 
 
 
@@ -595,11 +721,13 @@ GPT-4o Mini
 
 
 
+
 <button onclick="clearMemory()">
 
 🗑 Clear Memory
 
 </button>
+
 
 
 
@@ -613,7 +741,8 @@ GPT-4o Mini
 
 
 
-<!-- MAIN CHAT AREA -->
+
+<!-- CHAT AREA -->
 
 
 <div class="main">
@@ -624,7 +753,9 @@ GPT-4o Mini
 
 <div id="chat" class="chat">
 
+
 </div>
+
 
 
 
@@ -636,13 +767,11 @@ GPT-4o Mini
 
 
 
-
-
 <textarea
 
 id="input"
 
-placeholder="Message BOSS AI..."
+placeholder="Ask Brain AI..."
 
 ></textarea>
 
@@ -658,7 +787,9 @@ class="send"
 
 onclick="sendMessage()">
 
+
 ➤
+
 
 </button>
 
@@ -674,14 +805,17 @@ onclick="sendMessage()">
 
 
 
+
+</div>
+
+
+
+
+
+
 </div>
 
 
-
-
-
-
-</div>
 
 
 
@@ -690,13 +824,13 @@ onclick="sendMessage()">
 
 <script>
    // ================================
-// BOSS AI ENGINE
+// BRAIN AI ENGINE
 // ================================
 
 
 let messages =
 JSON.parse(
-localStorage.getItem("boss_memory") || "[]"
+localStorage.getItem("brain_memory") || "[]"
 );
 
 
@@ -720,17 +854,17 @@ document.getElementById("input");
 
 
 
-// Load settings
-
+// Load saved settings
 
 apiKey.value =
-localStorage.getItem("boss_key") || "";
+localStorage.getItem("brain_key") || "";
 
 
 model.value =
-localStorage.getItem("boss_model")
+localStorage.getItem("brain_model")
 ||
 "google/gemma-4-26B-A4B-it";
+
 
 
 
@@ -745,14 +879,14 @@ function saveSettings(){
 
 
 localStorage.setItem(
-"boss_key",
+"brain_key",
 apiKey.value.trim()
 );
 
 
 
 localStorage.setItem(
-"boss_model",
+"brain_model",
 model.value
 );
 
@@ -770,7 +904,39 @@ alert("Settings Saved ✅");
 
 
 
-// Load old chat
+// Auto scroll
+
+
+function scrollChat(){
+
+
+setTimeout(()=>{
+
+
+chat.scrollTo({
+
+top:chat.scrollHeight,
+
+behavior:"smooth"
+
+});
+
+
+},150);
+
+
+}
+
+
+
+
+
+
+
+
+
+
+// Load old messages
 
 
 function loadChat(){
@@ -800,8 +966,7 @@ false
 });
 
 
-chat.scrollTop =
-chat.scrollHeight;
+scrollChat();
 
 
 }
@@ -818,7 +983,7 @@ loadChat();
 
 
 
-// Add chat bubble
+// Add message bubble
 
 
 function addMessage(type,text,save=true){
@@ -845,41 +1010,43 @@ if(type==="bot"){
 
 
 
-let button =
+let copy =
 document.createElement("button");
 
 
-button.className =
+copy.className =
 "copy";
 
 
-button.innerText =
+copy.innerText =
 "📋 COPY";
 
 
 
-button.onclick=()=>{
+copy.onclick=()=>{
 
 
 navigator.clipboard.writeText(text);
 
 
-button.innerText =
+copy.innerText =
 "COPIED ✅";
 
 
 setTimeout(()=>{
 
-button.innerText="📋 COPY";
+
+copy.innerText="📋 COPY";
+
 
 },1500);
-
 
 
 };
 
 
-div.appendChild(button);
+
+div.appendChild(copy);
 
 
 }
@@ -918,8 +1085,10 @@ content:text
 
 if(messages.length>30){
 
+
 messages =
 messages.slice(-30);
+
 
 }
 
@@ -927,9 +1096,11 @@ messages.slice(-30);
 
 
 
+
+
 localStorage.setItem(
 
-"boss_memory",
+"brain_memory",
 
 JSON.stringify(messages)
 
@@ -943,8 +1114,8 @@ JSON.stringify(messages)
 
 
 
-chat.scrollTop =
-chat.scrollHeight;
+scrollChat();
+
 
 
 }
@@ -957,11 +1128,12 @@ chat.scrollHeight;
 
 
 
-// Format AI response
+
+
+// Text formatting
 
 
 function formatText(text){
-
 
 
 text =
@@ -1018,21 +1190,21 @@ return text;
 
 
 
-// Clear chat memory
+
+// Clear memory
 
 
 function clearMemory(){
 
 
-
-if(confirm("Delete all messages?")){
+if(confirm("Delete all chats?")){
 
 
 messages=[];
 
 
 localStorage.removeItem(
-"boss_memory"
+"brain_memory"
 );
 
 
@@ -1043,6 +1215,7 @@ loadChat();
 
 
 }
+
 
 
 
@@ -1057,12 +1230,11 @@ loadChat();
 function newChat(){
 
 
-
 messages=[];
 
 
 localStorage.removeItem(
-"boss_memory"
+"brain_memory"
 );
 
 
@@ -1079,7 +1251,7 @@ loadChat();
 
 
 
-// Sidebar toggle
+// Sidebar
 
 
 function toggleSidebar(){
@@ -1100,7 +1272,9 @@ document
 
 
 
-// Send AI request
+
+
+// Send message
 
 
 async function sendMessage(){
@@ -1109,7 +1283,6 @@ async function sendMessage(){
 
 let text =
 input.value.trim();
-
 
 
 let key =
@@ -1125,15 +1298,20 @@ return;
 
 
 
+
 if(!key){
 
+
 alert(
-"Enter OpenRouter API Key first"
+"Enter OpenRouter API Key"
 );
+
 
 return;
 
+
 }
+
 
 
 
@@ -1146,6 +1324,7 @@ text
 
 
 input.value="";
+
 
 
 
@@ -1164,11 +1343,16 @@ loading.id =
 
 
 loading.innerHTML =
-"🤖 Thinking...";
+"🧠 Brain AI is thinking...";
 
 
 
 chat.appendChild(loading);
+
+
+scrollChat();
+
+
 
 
 
@@ -1182,9 +1366,12 @@ try{
 let response =
 await fetch(
 
+
 "https://openrouter.ai/api/v1/chat/completions",
 
+
 {
+
 
 method:"POST",
 
@@ -1222,8 +1409,8 @@ temperature:0.7
 }
 
 
-);
 
+);
 
 
 
@@ -1245,13 +1432,21 @@ document
 
 
 
+scrollChat();
+
+
+
+
+
 
 
 if(data.error){
 
+
 throw new Error(
 data.error.message
 );
+
 
 }
 
@@ -1271,17 +1466,24 @@ data
 
 
 
-
 addMessage(
+
 "bot",
+
 reply
+
 );
 
 
 
 
 
+
 }
+
+
+
+
 
 catch(error){
 
@@ -1290,6 +1492,8 @@ catch(error){
 document
 .getElementById("loading")
 ?.remove();
+
+
 
 
 
@@ -1308,6 +1512,7 @@ addMessage(
 
 
 
+
 }
 
 
@@ -1318,14 +1523,14 @@ addMessage(
 
 
 
-// Enter send
+// Enter key send
 
 
 input.addEventListener(
 
 "keydown",
 
-function(e){
+(e)=>{
 
 
 if(
@@ -1344,16 +1549,15 @@ sendMessage();
 }
 
 
+
 }
+
+
 
 );
 
-
-</script>
-
-
+ </script>
 
 </body>
 
 </html>
-    
