@@ -659,6 +659,19 @@ font-size:20px;
 
 }
 
+.attach:active{
+
+transform:scale(.92);
+
+}
+
+
+.listening{
+
+box-shadow:
+0 0 20px red;
+
+}
 
 
 </style>
@@ -815,56 +828,36 @@ GPT-4o Mini
 
 <div class="input-area">
 
-
-
 <button
-
 class="attach"
-
 onclick="attachFile()"
-
 title="Attach file">
-
-+
-
+📎
 </button>
 
 
-
+<button
+class="attach"
+onclick="startVoice()"
+title="Voice input">
+🎤
+</button>
 
 
 <textarea
-
 id="input"
-
 placeholder="Ask Brain AI..."
-
 ></textarea>
 
 
-
-
-
-
-
 <button
-
 class="send"
-
 onclick="sendMessage()">
-
-
 ➤
-
-
 </button>
 
-
-
-
-
-
 </div>
+
 
 
 
@@ -1341,13 +1334,83 @@ document
 // Attach file
 
 
-function attachFile(){
+// ================================
+// VOICE INPUT
+// ================================
+
+let recognition;
+
+function startVoice(){
+
+if(
+!("webkitSpeechRecognition" in window) &&
+!("SpeechRecognition" in window)
+){
+
+alert("Voice input is not supported in this browser.");
+return;
+
+}
 
 
-alert("File attachment feature coming soon!");
+const SpeechRecognition =
+window.SpeechRecognition ||
+window.webkitSpeechRecognition;
+
+
+recognition = new SpeechRecognition();
+
+
+recognition.lang = "en-US";
+
+recognition.continuous = false;
+
+recognition.interimResults = false;
+
+
+recognition.onstart = ()=>{
+
+console.log("Listening...");
+
+};
+
+
+recognition.onresult = (event)=>{
+
+let text =
+event.results[0][0].transcript;
+
+
+input.value +=
+(text + " ");
+
+
+};
+
+
+recognition.onerror = (event)=>{
+
+alert(
+"Voice error: " + event.error
+);
+
+};
+
+
+recognition.start();
 
 
 }
+
+
+
+// temporary attach function
+function attachFile(){
+
+alert("File upload will be added in Part 2");
+
+}
+
 
 
 
