@@ -367,24 +367,44 @@
     const botDiv = addMessage("Initializing Response...", 'bot');
     
     try {
-      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
-        headers: { 
-          "Authorization": `Bearer ${API_KEY}`, 
-          "Content-Type": "application/json"
+        headers: {
+            "Authorization": `Bearer ${API_KEY}`,
+            "Content-Type": "application/json",
+            "HTTP-Referer": window.location.origin,
+            "X-Title": "BOSS AI"
         },
-        body: JSON.stringify({ 
-          model: "google/gemini-2.0-flash-001",
-          messages: [
-            {role: "system", content: SYSTEM_PROMPT},
-            ...chatHistory // FIXED: Sends all previous messages
-          ],
-          temperature: 0.6
+        body: JSON.stringify({
+            model: "google/gemini-2.0-flash-001",
+            messages: [
+                { role: "system", content: SYSTEM_PROMPT },
+                ...chatHistory
+            ],
+            temperature: 0.6
         })
-      });
-      
-      const data = await res.json();
-      const response = data.choices?.[0]?.message?.content || "System encountered an error.";
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+        throw new Error(data.error?.message || "Unknown API error");
+    }
+
+    const response = data.choices[0].message.content;
+
+    chatHistory.push({
+        role: "assistant",
+        content: response
+    });
+
+    botDiv.textContent = response;
+
+} catch (err) {
+    console.error(err);
+    botDiv.textContent = "❌ " + err.message;
+}
+
       
       // Store AI response in history
       chatHistory.push({role: "assistant", content: response});
