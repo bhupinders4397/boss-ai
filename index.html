@@ -309,21 +309,21 @@
   6. Present reasoning only if asked.`;
 
   function login() {
-    const pass = document.getElementById('password').value;
-    const user = document.getElementById('username').value;
-    console.log("Entered:", pass);
-console.log("Expected:", "bhupi2026");
+    alert("login() called");
 
-if (pass === "bhupi2026") {
+    const pass = document.getElementById("password").value.trim();
+    const user = document.getElementById("username").value.trim();
 
-      currentUser = user || "Operator";
-      localStorage.setItem("user", currentUser);
-      document.getElementById('loginPage').classList.add('hidden');
-      userInput.focus();
+    alert("Password: " + pass);
+
+    if (pass === "bhupi2026") {
+        alert("Success!");
+        document.getElementById("loginPage").classList.add("hidden");
     } else {
-      alert("Access Denied");
+        alert("Access Denied");
     }
-  }
+}
+
 
   // Voice Logic
   const micBtn = document.getElementById('micBtn');
