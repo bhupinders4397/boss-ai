@@ -308,18 +308,22 @@
   5. Use structured formatting (bullets/bold) for clarity. 📊
   6. Present reasoning only if asked.`;
 
-  function login() {
-    const pass = document.getElementById('password').value;
-    const user = document.getElementById('username').value;
-    if(pass === "bhupi2026") {
-      currentUser = user || "Operator";
-      localStorage.setItem("user", currentUser);
-      document.getElementById('loginPage').classList.add('hidden');
-      userInput.focus();
-    } else {
-      alert("Access Denied");
-    }
+  
+function login() {
+  const pass = document.getElementById("password").value.trim();
+  const user = document.getElementById("username").value.trim();
+
+  if (pass === "bhupi2026") {
+    currentUser = user || "Operator";
+    localStorage.setItem("user", currentUser);
+
+    document.getElementById("loginPage").classList.add("hidden");
+    userInput.focus();
+  } else {
+    alert("Wrong password! Please enter the correct password.");
   }
+}
+
 
   // Voice Logic
   const micBtn = document.getElementById('micBtn');
