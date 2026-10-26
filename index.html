@@ -310,26 +310,26 @@
 
   
 
-function login() {
-  const pass = document.getElementById("password").value.trim();
-  const user = document.getElementById("username").value.trim();
-  const loginPage = document.getElementById("loginPage");
 
-  if (pass === "bhupi2026") {
-    currentUser = user || "Operator";
+<script>
+  function login() {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
 
-    try {
-      localStorage.setItem("user", currentUser);
-    } catch (e) {
-      console.warn("User storage unavailable:", e);
+    if (!username || !password) {
+      alert("Please enter Login and Password!");
+      return;
     }
 
-    loginPage.classList.add("hidden");
-    userInput.focus();
-  } else {
-    alert("Access Denied! Password check karo.");
+    if (username === "bhupi2026" && password === "bhupi2026") {
+      alert("BOSS AI System Initialized Successfully!");
+      document.getElementById("loginPage").style.display = "none";
+    } else {
+      alert("Invalid Login or Password!");
+    }
   }
-}
+</script>
+
 
 
 
