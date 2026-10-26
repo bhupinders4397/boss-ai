@@ -352,39 +352,103 @@
     userInput.focus();
   }
 
-  async function sendMessage() {
-    const text = userInput.value.trim();
-    if(!text) return;
-    if(!API_KEY) { toggleSettings(true); return; }
+  
+async function sendMessage() {
+  const text = userInput.value.trim();
+  if (!text) return;
 
-    welcomeBg.style.opacity = '0';
-    addMessage(text, 'user');
-    
-    // Add to history
-    chatHistory.push({role: "user", content: text});
-    
-    userInput.value = '';
-    const botDiv = addMessage("Initializing Response...", 'bot');
-    
-    try {
-      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+  if (!API_KEY) {
+    toggleSettings(true);
+    return;
+  }
+
+  welcomeBg.style.opacity = "0";
+  addMessage(text, "user");
+  userInput.value = "";
+
+  const historyLength = chatHistory.length;
+  chatHistory.push({ role: "user", content: text });
+
+  const botDiv = addMessage("🤖 BOSS AI is thinking...", "bot");
+
+  try {
+    const res = await fetch(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
         method: "POST",
-        headers: { 
-          "Authorization": `Bearer ${API_KEY}`, 
-          "Content-Type": "application/json"
+        headers: {
+          "Authorization": `Bearer ${API_KEY.trim()}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": window.location.origin,
+          "X-OpenRouter-Title": "BOSS AI"
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           model: "google/gemma-4-26b-a4b-it:free",
           messages: [
-            {role: "system", content: SYSTEM_PROMPT},
-            ...chatHistory // FIXED: Sends all previous messages
+            { role: "system", content: SYSTEM_PROMPT },
+            ...chatHistory
           ],
           temperature: 0.6
         })
-      });
-      
-      const data = await res.json();
-      const response = data.choices?.[0]?.message?.content || "System encountered an error.";
+      }
+    );
+
+    const data = await res.json().catch(() => null);
+
+    // API / provider errors, including errors inside HTTP 200
+    if (!res.ok || data?.error) {
+      const apiError = data?.error;
+      const message =
+        typeof apiError?.message === "string"
+          ? apiError.message
+          : data?.message || `HTTP ${res.status}`;
+
+      throw new Error(
+        `OpenRouter (${apiError?.code || res.status}): ${message}`
+      );
+    }
+
+    const choice = data?.choices?.[0];
+
+    if (choice?.finish_reason === "error") {
+      throw new Error(
+        data?.error?.message || "Model provider generation failed."
+      );
+    }
+
+    const response = choice?.message?.content;
+
+    if (typeof response !== "string" || !response.trim()) {
+      throw new Error(
+        "Empty model response. Check provider availability and API response."
+      );
+    }
+
+    chatHistory.push({
+      role: "assistant",
+      content: response
+    });
+
+    botDiv.textContent = response;
+
+  } catch (error) {
+    console.error("BOSS AI API Error:", error);
+
+    // Remove failed request from API conversation history
+    chatHistory.splice(historyLength);
+
+    botDiv.textContent =
+      "❌ BOSS AI Error\n\n" +
+      (error.message || "Unknown error") +
+      "\n\nCheck your OpenRouter API key, model availability, and connection.";
+  }
+
+  chatBox.scrollTo({
+    top: chatBox.scrollHeight,
+    behavior: "smooth"
+  });
+}
+
       
       // Store AI response in history
       chatHistory.push({role: "assistant", content: response});
