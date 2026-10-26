@@ -406,17 +406,27 @@ async function sendMessage() {
     const data = await res.json().catch(() => null);
 
     // API / provider errors, including errors inside HTTP 200
-    if (!res.ok || data?.error) {
-      const apiError = data?.error;
-      const message =
-        typeof apiError?.message === "string"
-          ? apiError.message
-          : data?.message || `HTTP ${res.status}`;
+if (!res.ok || data?.error) {
+  const apiError = data?.error || {};
 
-      throw new Error(
-        `OpenRouter (${apiError?.code || res.status}): ${message}`
-      );
-    }
+  console.error("OpenRouter diagnostic:", {
+    httpStatus: res.status,
+    error: apiError,
+    retryAfter: res.headers.get("Retry-After"),
+    rateLimitLimit: res.headers.get("X-RateLimit-Limit"),
+    rateLimitRemaining: res.headers.get("X-RateLimit-Remaining"),
+    rateLimitReset: res.headers.get("X-RateLimit-Reset"),
+    model: "google/gemma-4-26b-a4b-it:free"
+  });
+
+  throw new Error(
+    JSON.stringify({
+      status: res.status,
+      message: apiError.message || data?.message || "Unknown API error",
+      metadata: apiError.metadata || null
+    }, null, 2)
+  );
+}
 
     const choice = data?.choices?.[0];
 
