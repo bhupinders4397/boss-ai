@@ -309,20 +309,28 @@
   6. Present reasoning only if asked.`;
 
   
+
 function login() {
   const pass = document.getElementById("password").value.trim();
   const user = document.getElementById("username").value.trim();
+  const loginPage = document.getElementById("loginPage");
 
   if (pass === "bhupi2026") {
     currentUser = user || "Operator";
-    localStorage.setItem("user", currentUser);
 
-    document.getElementById("loginPage").classList.add("hidden");
+    try {
+      localStorage.setItem("user", currentUser);
+    } catch (e) {
+      console.warn("User storage unavailable:", e);
+    }
+
+    loginPage.classList.add("hidden");
     userInput.focus();
   } else {
-    alert("Wrong password! Please enter the correct password.");
+    alert("Access Denied! Password check karo.");
   }
 }
+
 
 
   // Voice Logic
